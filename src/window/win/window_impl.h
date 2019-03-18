@@ -9,7 +9,7 @@
 #define WINDOW_STYLE WS_VISIBLE | WS_OVERLAPPEDWINDOW
 #define WINDOW_STYLE_EX WS_EX_LEFT
 
-struct {
+static struct {
     HWND hWnd;
     HINSTANCE hInstance;
     HDC mainHDc;
