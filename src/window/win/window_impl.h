@@ -96,14 +96,14 @@ static LRESULT CALLBACK wndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
                 self.mainHDc,
                 &bmi,
                 DIB_RGB_COLORS,
-                &self.pixels,
+                (void **)&self.pixels,
                 NULL,
                 0
             );
             self.bufferHDc = CreateCompatibleDC(self.mainHDc);
             SelectObject(self.bufferHDc, buffer);
 
-            for (int i = 0; i < self.width*self.height; ++i) {
+            for (unsigned i = 0; i < self.width*self.height; ++i) {
                 self.pixels[i] = i % 50;
             }
             break;
@@ -118,7 +118,7 @@ static LRESULT CALLBACK wndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
         case WM_PAINT: {
             RECT updateRect;
             if (GetUpdateRect(hWnd, &updateRect, FALSE)) {
-                printf("%d %d %d %d\n", updateRect.left, updateRect.top, updateRect.right, updateRect.bottom);
+                printf("%ld %ld %ld %ld\n", updateRect.left, updateRect.top, updateRect.right, updateRect.bottom);
                 BitBlt(self.mainHDc, updateRect.left, updateRect.top, updateRect.right - updateRect.left, updateRect.bottom - updateRect.top, self.bufferHDc, updateRect.left, updateRect.top, SRCCOPY);
                 ValidateRect(hWnd, &updateRect);
             }
