@@ -1,16 +1,10 @@
 SOURCES = \
-src/window/window.c \
-src/fenwickTree/fenwickTreeI32.c \
+src/buffer.c
 
 HEADERS = \
-include/window/window.h \
-src/window/win/window_impl.h \
-src/window/linux/window_impl.h \
-include/fenwickTree/fenwickTreeI32.h \
-include/fenwickTree/_fenwickTree.h \
+include/buffer.h
 
 TEST_HEADERS = \
-test/fenwickTree/test_fenwickTreeI32.h \
 
 WIN_DEBUG = build/debug/hedit.exe
 WIN_RELEASE = build/release/hedit.exe
