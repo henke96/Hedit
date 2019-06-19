@@ -5,97 +5,52 @@
 #include <assert.h>
 #include <stdio.h>
 
-static inline int buffer_chunk_init(
-    struct buffer_chunk *self,
-    const char *text,
-    int64_t length
-) {
-    assert(length >= 0);
+static char getCharAt(struct buffer *self, int64_t bufferOffset) {
+    assert(bufferOffset >= 0);
 
-    self->text = malloc(length);
-    if (!self->text) return -1;
-    memcpy(self->text, text, length);
-    self->length = length;
-    return 0;
-}
+    int64_t offset = bufferOffset; // An offset into text that will be calculated with modifications in mind.
+    for (int32_t i = 0; i < self->numModifications; ++i) {
+        struct buffer_modification *nextModification = &self->modifications[i];
+        
+        if (offset >= nextModification->textOffset) {
+            // This modification affects us since it's earier than the current offset.
 
-static inline void buffer_chunk_deinit(struct buffer_chunk *self) {
-    free(self->text);
-}
+            if (offset < nextModification->textOffset + nextModification->delta) {
+                // The character is inside the modification, and it is an insertion.
+                assert(nextModification->insert && nextModification->delta > 0);
 
-static inline void buffer_chunk_deleteAt(struct buffer_chunk *self, int64_t offset) {
-    --self->length;
-    memmove(&self->text[offset], &self->text[offset + 1], self->length - offset);
+                int64_t insertTextOffset = offset - nextModification->textOffset;
+                return nextModification->insert[insertTextOffset];
+            } else {
+                // We are beyond this modification, adjust for it.
+                offset -= nextModification->delta;
+            }
+        } else {
+            // We're out of modifications that are before offset.
+            break;
+        }
+    }
+    return self->text[offset];
 }
 
 static inline void buffer_cursor_init(
-    struct buffer_cursor *self,
-    int32_t chunkIndex,
-    int32_t chunkOffset
+    struct buffer_cursor *self
 ) {
-    assert(chunkIndex >= 0 && chunkOffset >= 0);
-
-    self->chunkIndex = chunkIndex;
-    self->chunkOffset = chunkOffset;
+    self->textOffset = 0;
 }
 
-static inline int buffer_cursorInValidState(struct buffer *self) {
-    struct buffer_cursor cursor = self->cursor;
-    return (
-        cursor.chunkIndex >= 0 && (
-            cursor.chunkIndex < self->numChunks || (
-                cursor.chunkIndex == self->numChunks &&
-                cursor.chunkOffset == 0
-            )
-        )
-    );
-}
-
-static inline void buffer_deleteChunk(struct buffer *self, int32_t chunkIndex) {
-    buffer_chunk_deinit(&self->chunks[chunkIndex]);
-    --self->numChunks;
-    memmove(
-        &self->chunks[chunkIndex],
-        &self->chunks[chunkIndex + 1],
-        (self->numChunks - chunkIndex) * sizeof(self->chunks[0])
-    );
-}
-
-int buffer_init(struct buffer *self, const char *initialText, int64_t initialTextLength) {
-    assert(initialTextLength >= 0);
+int buffer_init(struct buffer *self, const char *text, int64_t textLength) {
+    assert(textLength >= 0);
+    self->text = text;
+    self->textLength = textLength;
     
-    self->numChunks = (initialTextLength + BUFFER_CHUNK_SIZE - 1) / BUFFER_CHUNK_SIZE; // Round up.
-
-    self->chunks = malloc(self->numChunks * sizeof(self->chunks[0]));
-    if (!self->chunks) return BUFFER_MEMORY_ALLOCATION_ERROR;
-
-    // Spread the text out over the chunks.
-    int64_t textOffset = 0;
-    for (int32_t i = 0; i < self->numChunks; ++i) {
-        const int64_t remainingTextLength = initialTextLength - textOffset;
-        const int32_t remainingChunks = self->numChunks - i;
-        const int32_t chunkLength = remainingTextLength / remainingChunks;
-
-        if (buffer_chunk_init(&self->chunks[i], &initialText[textOffset], chunkLength) < 0) {
-            // Clean up if a chunk allocation fails.
-            while (i--) {
-                buffer_chunk_deinit(&self->chunks[i]);
-            }
-            free(self->chunks);
-            return BUFFER_MEMORY_ALLOCATION_ERROR;
-        }
-        textOffset += chunkLength;
-    }
-
-    buffer_cursor_init(&self->cursor, 0, 0);
+    self->numModifications = 0;
+    self->modifications = NULL;
     return 0;
 }
 
 void buffer_deinit(struct buffer *self) {
-    for (int32_t i = 0; i < self->numChunks; ++i) {
-        buffer_chunk_deinit(&self->chunks[i]);
-    }
-    free(self->chunks);
+    free(self->modifications);
 }
 
 void buffer_setCursor(struct buffer *self, int64_t row, int64_t col);

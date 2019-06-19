@@ -2,27 +2,27 @@
 #include <inttypes.h>
 #include <assert.h>
 
-#define BUFFER_CHUNK_SIZE 0xFFFF
-
 #define BUFFER_MEMORY_ALLOCATION_ERROR -1
 
-struct buffer_chunk {
-    char *text;
-    int64_t length;
+struct buffer_modification {
+    char *insert; // NULL if deletion, else the inserted text.
+    int64_t textOffset; // Offset where the modification is made.
+    int64_t delta; // The length delta of this modification. Negative if deletion, positive if insertion.
 };
 
 struct buffer_cursor {
-    int32_t chunkIndex;
-    int32_t chunkOffset;
+    int64_t bufferOffset;
 };
 
 struct buffer {
     struct buffer_cursor cursor;
-    struct buffer_chunk *chunks;
-    int32_t numChunks;
+    const char *text;
+    int64_t textLength;
+    struct buffer_modification *modifications;
+    int32_t numModifications;
 };
 
-int buffer_init(struct buffer *self, const char *initialText, int64_t initialTextLength);
+int buffer_init(struct buffer *self, const char *text, int64_t textLength);
 void buffer_deinit(struct buffer *self);
 
 void buffer_setCursor(struct buffer *self, int64_t row, int64_t col);
