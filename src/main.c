@@ -7,12 +7,25 @@ void printChar(struct buffer *buffer) {
     printf("%c", buffer_getAtCursor(buffer));
 }
 
-int main(int argc, char **argv) {
+void test2(void) {
     struct buffer buffer;
-    if (buffer_init(&buffer, "Hello world!", 13) < 0) {
-        printf("Failed to init buffer.\n");
-        return 1;
-    }
+    buffer_init(&buffer, "Hello world!", 13);
+    buffer_moveCursor(&buffer, 0);
+    printChar(&buffer);
+    buffer_moveCursor(&buffer, 6);
+    printChar(&buffer);
+    buffer_moveCursor(&buffer, -2);
+    printChar(&buffer);
+
+    buffer_moveCursor(&buffer, 1);
+    printChar(&buffer);
+    buffer_deinit(&buffer);
+    
+}
+/*
+void test1(void) {
+    struct buffer buffer;
+    buffer_init(&buffer, "Hello world!", 13);
 
     printChar(&buffer);
     buffer_moveCursor(&buffer, 6);
@@ -43,5 +56,10 @@ int main(int argc, char **argv) {
     buffer_moveCursor(&buffer, 1);
 
     buffer_deinit(&buffer);
+    
+}
+*/
+int main(int argc, char **argv) {
+    test2();
     return 0;
 }

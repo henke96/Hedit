@@ -5,48 +5,20 @@
 #include <assert.h>
 #include <stdio.h>
 
-static char getCharAt(struct buffer *self, int64_t bufferOffset) {
-    assert(bufferOffset >= 0);
-
-    int64_t offset = bufferOffset; // An offset into text that will be calculated with modifications in mind.
-    for (int32_t i = 0; i < self->numModifications; ++i) {
-        struct buffer_modification *nextModification = &self->modifications[i];
-        
-        if (offset >= nextModification->textOffset) {
-            // This modification affects us since it's earier than the current offset.
-
-            if (offset < nextModification->textOffset + nextModification->delta) {
-                // The character is inside the modification, and it is an insertion.
-                assert(nextModification->insert && nextModification->delta > 0);
-
-                int64_t insertTextOffset = offset - nextModification->textOffset;
-                return nextModification->insert[insertTextOffset];
-            } else {
-                // We are beyond this modification, adjust for it.
-                offset -= nextModification->delta;
-            }
-        } else {
-            // We're out of modifications that are before offset.
-            break;
-        }
-    }
-    return self->text[offset];
-}
-
-static inline void buffer_cursor_init(
-    struct buffer_cursor *self
-) {
-    self->textOffset = 0;
-}
-
-int buffer_init(struct buffer *self, const char *text, int64_t textLength) {
+void buffer_init(struct buffer *self, const char *text, int64_t textLength) {
     assert(textLength >= 0);
     self->text = text;
     self->textLength = textLength;
     
     self->numModifications = 0;
     self->modifications = NULL;
-    return 0;
+
+    // Initialize cursor.
+    self->cursor.offset = 0;
+    self->cursor.prevModificationIndex = -1;
+    if (self->textLength > 0) {
+        self->cursor.currentChar = self->text[self->cursor.offset];
+    }
 }
 
 void buffer_deinit(struct buffer *self) {
@@ -56,50 +28,108 @@ void buffer_deinit(struct buffer *self) {
 void buffer_setCursor(struct buffer *self, int64_t row, int64_t col);
 
 void buffer_moveCursor(struct buffer *self, int64_t offset) {
-    self->cursor.chunkOffset += offset;
-    if (self->cursor.chunkOffset < 0) {
-        // Negative chunkOffset means we need to go to an earlier chunk.
-        do {
-            --self->cursor.chunkIndex;
-            assert(buffer_cursorInValidState(self));
-            int64_t chunkLength = self->chunks[self->cursor.chunkIndex].length;
-            self->cursor.chunkOffset += chunkLength;
-        } while (self->cursor.chunkOffset < 0);
+    int32_t i = self->cursor.prevModificationIndex;
+    int64_t cursorOffset = self->cursor.offset + offset;
+    if (offset >= 0) {
+        if (i < 0) {
+            assert(i == -1);
+            if (self->numModifications == 0 || cursorOffset < self->modifications[0].intervalStart) {
+                assert(cursorOffset >= 0 && cursorOffset <= self->textLength);
+
+                self->cursor.offset = cursorOffset;
+                self->cursor.currentChar = self->text[cursorOffset];
+                return;
+            }
+            i = 0;
+            cursorOffset -= self->modifications[0].intervalStart;
+        }
+        assert(self->numModifications > 0);
+
+        while (1) {
+            if (cursorOffset < self->modifications[i].insertLength) {
+                // We are inside inserted text.
+                self->cursor.currentChar = self->modifications[i].insert[cursorOffset];
+                goto skip_setting_currentChar;
+            }
+            // We are beyond the modification.
+            
+            if (i == self->numModifications - 1) {
+                // We are after the last modification.
+                assert(self->modifications[i].intervalStart + cursorOffset <= self->textLength);
+                break;
+            }
+            assert(i < self->numModifications - 1);
+
+            int64_t newTextOffset = (
+                self->modifications[i].intervalEnd +
+                cursorOffset - self->modifications[i].insertLength // Cursor offset beyond the end.
+            );
+
+            if (newTextOffset >= self->modifications[i + 1].intervalStart) {
+                // We are past the next modification.
+                ++i;
+                cursorOffset = newTextOffset - self->modifications[i].intervalStart;
+            } else {
+                // We are between prev and next.
+                break;
+            }
+        }
     } else {
-        int64_t chunkLength = self->chunks[self->cursor.chunkIndex].length;
-        // chunkOffset larger than the chunk length means we need to go to a later chunk.
-        while (self->cursor.chunkOffset >= chunkLength) {
-            ++self->cursor.chunkIndex;
-            self->cursor.chunkOffset -= chunkLength;
-            assert(buffer_cursorInValidState(self));
-            chunkLength = self->chunks[self->cursor.chunkIndex].length;
+        // Move backwards.
+
+        if (i < 0) {
+            assert(i == -1);
+            assert(cursorOffset >= 0 && cursorOffset <= self->textLength);
+            assert(
+                self->numModifications == 0 ||
+                cursorOffset < self->modifications[0].intervalStart
+            );
+
+            self->cursor.offset = cursorOffset;
+            self->cursor.currentChar = self->text[cursorOffset];
+            return;
+        }
+        assert(self->numModifications > 0);
+
+        while (1) {
+            if (cursorOffset >= 0) {
+                // We are past the modification.
+                if (cursorOffset < self->modifications[i].insertLength) {
+                    // We are inside inserted text.
+                    self->cursor.currentChar = self->modifications[i].insert[cursorOffset];
+                    goto skip_setting_currentChar;
+                }
+                // We are beyond it.
+                break;
+            }
+            // We are before the modification.
+            
+            // Make it be an offset from 0 instead of from the previous modification start.
+            cursorOffset += self->modifications[i].intervalStart;
+            
+            --i;
+            if (i < 0) {
+                // We are before the first modification.
+                assert(cursorOffset >= 0);
+                self->cursor.currentChar = self->text[cursorOffset];
+                goto skip_setting_currentChar;
+            }
+
+            // Adjust the offset so it's relative to the new previous modification.
+            cursorOffset -= self->modifications[i].intervalEnd;
+            cursorOffset += self->modifications[i].insertLength;
         }
     }
+    self->cursor.currentChar = self->text[self->modifications[i].intervalEnd + cursorOffset - self->modifications[i].insertLength];
+    skip_setting_currentChar:
+    self->cursor.offset = cursorOffset;
+    self->cursor.prevModificationIndex = i;
 }
 
-void buffer_insertBeforeCursor(struct buffer *self, char c) {
+void buffer_insertAtCursor(struct buffer *self, char c) {
 
 }
 
 void buffer_deleteAtCursor(struct buffer *self) {
-    assert(
-        self->cursor.chunkIndex < self->numChunks &&
-        self->cursor.chunkOffset < self->chunks[self->cursor.chunkIndex].length
-    );
 
-    struct buffer_chunk *chunk = &self->chunks[self->cursor.chunkIndex];
-    buffer_chunk_deleteAt(chunk, self->cursor.chunkOffset);
-
-    if (chunk->length == 0) {
-        buffer_deleteChunk(self, self->cursor.chunkIndex);
-        
-        // Don't have to do anything with cursor since we must've been at offset 0
-        // already and the chunk gets replaced by the next one.
-        assert(self->cursor.chunkOffset == 0);
-    } else if (self->cursor.chunkOffset >= chunk->length) {
-        // Cursor is at an invalid chunkOffset because we deleted the right most character in the chunk.
-        // Move to offset 0 of the next chunk.
-        ++self->cursor.chunkIndex;
-        self->cursor.chunkOffset = 0;
-    }
 }
