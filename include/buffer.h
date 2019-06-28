@@ -8,13 +8,12 @@ struct buffer_modification {
     int64_t intervalStart;
     int64_t intervalEnd;
     int64_t insertLength;
-    char *insert;
+    char *insertEnd;
 };
 
 struct buffer_cursor {
-    int64_t offset; // Offset from previous modification.
+    int64_t offset;
     int32_t prevModificationIndex; // -1 if none.
-    char currentChar;
 };
 
 struct buffer {
@@ -32,37 +31,34 @@ void buffer_moveCursor(struct buffer *self, int64_t offset);
 void buffer_insertAtCursor(struct buffer *self, char c);
 void buffer_deleteAtCursor(struct buffer *self);
 
+static inline char buffer_cursorNext(struct buffer *self) {
+    ++self->cursor.offset;
+    if (self->cursor.offset > 0) {
+        int32_t next = self->cursor.prevModificationIndex + 1;
+        if (
+            next < self->numModifications &&
+            self->cursor.offset >= self->modifications[next].intervalStart
+        ) {
+            self->cursor.prevModificationIndex = next;
+            if (self->modifications[next].insertLength == 0) {
+                self->cursor.offset = self->modifications[next].intervalEnd;
+            } else {
+                self->cursor.offset = -self->modifications[next].insertLength;
+                return self->modifications[next].insertEnd[self->cursor.offset];
+            }
+        } 
+    } else if (self->cursor.offset < 0) {
+        return self->modifications[self->cursor.prevModificationIndex].insertEnd[self->cursor.offset];
+    } else {
+        self->cursor.offset = self->modifications[self->cursor.prevModificationIndex].intervalEnd;
+    }
+    return self->text[self->cursor.offset];
+}
+
 static inline char buffer_getAtCursor(const struct buffer *self) {
-    assert(
-        self->cursor.prevModificationIndex != -1 || (
-            // Index is -1.
-            self->cursor.offset < self->textLength
-        )
-    );
-    assert(
-        (
-            self->cursor.prevModificationIndex == -1 ||
-            self->cursor.prevModificationIndex != self->numModifications - 1
-        ) || (
-            // It's the last modification.
-            (
-                self->modifications[self->numModifications - 1].intervalEnd +
-                self->cursor.offset - self->modifications[self->numModifications - 1].insertLength
-            ) < self->textLength
-        )
-    );
-    return self->cursor.currentChar;
-    /*if (self->cursor.prevModificationIndex < 0) {
-        assert(self->cursor.prevModificationIndex == -1);
+    if (self->cursor.offset < 0) {
+        return self->modifications[self->cursor.prevModificationIndex].insertEnd[self->cursor.offset];
+    } else {
         return self->text[self->cursor.offset];
     }
-
-    struct buffer_modification *prevModification = &self->modifications[self->cursor.prevModificationIndex];
-    if (self->cursor.offset < prevModification->insertLength) {
-        return prevModification->insert[self->cursor.offset];
-    }
-
-    return self->text[
-        prevModification->intervalEnd + self->cursor.offset - prevModification->insertLength
-    ];*/
 }

@@ -10,11 +10,12 @@ void printChar(struct buffer *buffer) {
 void test2(void) {
     struct buffer buffer;
     buffer_init(&buffer, "Hello world!", 13);
+    // Hello hworld!
     buffer_moveCursor(&buffer, 0);
     printChar(&buffer);
     buffer_moveCursor(&buffer, 6);
     printChar(&buffer);
-    buffer_moveCursor(&buffer, -2);
+    buffer_moveCursor(&buffer, -3);
     printChar(&buffer);
 
     buffer_moveCursor(&buffer, 1);
