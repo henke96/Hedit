@@ -10,26 +10,30 @@ static int buffer_modification_init(
     int64_t intervalStart,
     int64_t intervalLength,
     int64_t insertLength,
-    char *insertStart
+    const char *insertStart
 ) {
-    char *insert = malloc(insertLength);
-    if (!insert) return -1;
+    assert(intervalLength >= 0);
+    assert(insertLength >= 0);
+    if (insertLength > 0) {
+        char *insert = malloc(insertLength);
+        if (!insert) return -1;
+
+        memcpy(insert, insertStart, insertLength);
+        self->insertEnd = insert + insertLength;
+    }
 
     self->intervalStart = intervalStart;
     self->intervalEnd = intervalStart + intervalLength;
-    self->insertEnd = insertStart + insertLength;
-    // Above might be UB when insertEnd is NULL, even though insertLength is 0?
-    assert(insertStart != NULL || self->insertEnd == NULL);
 
     self->insertLength = insertLength;
     return 0;
 }
 
 static void buffer_modification_deinit(struct buffer_modification *self) {
-    char *insertStart = self->insertEnd - self->insertLength;
-    // Above might be UB when insertEnd is NULL, even though insertLength is 0?
-    assert(self->insertEnd != NULL || insertStart == NULL);
-    //free(insertStart);
+    if (self->insertLength > 0) {
+        char *insertStart = self->insertEnd - self->insertLength;
+        free(insertStart);
+    }
 }
 
 static void testInit(struct buffer *self) {
