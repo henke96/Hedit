@@ -22,14 +22,15 @@ struct buffer {
     int64_t textLength;
     struct buffer_modification *modifications;
     int32_t numModifications;
+    int64_t bufferLength;
 };
 
 void buffer_init(struct buffer *self, const char *text, int64_t textLength);
 void buffer_deinit(struct buffer *self);
 
 void buffer_moveCursor(struct buffer *self, int64_t offset);
-void buffer_insertAtCursor(struct buffer *self, char c);
-void buffer_deleteAtCursor(struct buffer *self);
+int buffer_insertAtCursor(struct buffer *self, const char *str, int64_t strLength);
+void buffer_deleteAtCursor(struct buffer *self, int64_t length);
 
 static inline char buffer_cursorNext(struct buffer *self) {
     ++self->cursor.offset;
