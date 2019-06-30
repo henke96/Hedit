@@ -80,8 +80,6 @@ void buffer_deinit(struct buffer *self) {
     free(self->modifications);
 }
 
-void buffer_setCursor(struct buffer *self, int64_t row, int64_t col);
-
 void buffer_moveCursor(struct buffer *self, int64_t offset) {
     self->cursor.bufferOffset += offset;
     assert(self->cursor.bufferOffset >= 0 && self->cursor.bufferOffset <= self->bufferLength);
@@ -164,43 +162,43 @@ static void optimizeModification(struct buffer *self, int32_t index) {
     struct buffer_modification *modification = &self->modifications[index];
 
     const int64_t intervalLength = modification->intervalEnd - modification->intervalStart;
-    if (modification->insertLength == intervalLength) {
-        char *insertStart = modification->insertEnd - modification->insertLength;
-        const char *intervalStart = &self->text[modification->intervalStart];
+    if (modification->insertLength != intervalLength) return;
 
-        int64_t newLeft = 0;
-        while (1) {
-            if (newLeft == intervalLength) {
-                // The whole interval matches the whole insert.
-                buffer_modification_deinit(modification);
-                deleteModificationAt(self, index);
-                return;
-            }
-            if (intervalStart[newLeft] != insertStart[newLeft]) break;
-            ++newLeft;
+    char *insertStart = modification->insertEnd - modification->insertLength;
+    const char *intervalStart = &self->text[modification->intervalStart];
+
+    int64_t newLeft = 0;
+    while (1) {
+        if (newLeft == intervalLength) {
+            // The whole interval matches the whole insert.
+            buffer_modification_deinit(modification);
+            deleteModificationAt(self, index);
+            return;
         }
-        assert(intervalLength > 0);
+        if (intervalStart[newLeft] != insertStart[newLeft]) break;
+        ++newLeft;
+    }
+    assert(intervalLength > 0);
 
-        int64_t newRight = intervalLength;
-        while (intervalStart[newRight] == insertStart[newRight]) {
-            --newRight;
+    int64_t newRight = intervalLength;
+    while (intervalStart[newRight] == insertStart[newRight]) {
+        --newRight;
+    }
+    assert(newRight > newLeft);
+
+    const int64_t newLength = newRight - newLeft;
+    if (newLength != intervalLength) {
+        memmove(insertStart, insertStart + newLeft, newLength);
+
+        char *newInsertStart = realloc(insertStart, newLength);
+        if (!newInsertStart) {
+            newInsertStart = insertStart;
         }
-        assert(newRight > newLeft);
 
-        const int64_t newLength = newRight - newLeft;
-        if (newLength != intervalLength) {
-            memmove(insertStart, insertStart + newLeft, newLength);
-
-            char *newInsertStart = realloc(insertStart, newLength);
-            if (!newInsertStart) {
-                newInsertStart = insertStart;
-            }
-
-            modification->insertLength = newLength;
-            modification->insertEnd = newInsertStart + newLength;
-            modification->intervalStart += newLeft;
-            modification->intervalEnd = modification->intervalStart + newLength;
-        }
+        modification->insertLength = newLength;
+        modification->insertEnd = newInsertStart + newLength;
+        modification->intervalStart += newLeft;
+        modification->intervalEnd = modification->intervalStart + newLength;
     }
 }
 
