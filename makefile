@@ -21,7 +21,7 @@ DEBUG_FLAGS = -g3 -Wno-unused-parameter
 TEST_FLAGS = 
 
 WIN_FLAGS =
-WIN_RELEASE_FLAGS = -Wl,-subsystem,windows
+WIN_RELEASE_FLAGS = # -Wl,-subsystem,windows
 WIN_LIBS = -lgdi32
 
 LINUX_FLAGS = -no-pie -fno-pie # Make gcc generate elf.
