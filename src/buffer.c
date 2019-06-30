@@ -29,25 +29,60 @@ static int buffer_modification_init(
     return 0;
 }
 
-static int buffer_modification_insert(struct buffer_modification *self, int64_t insertOffset, const char *str, int64_t strLength) {
-    if (self->insertLength > 0) {
-        int64_t newLength = self->insertLength + strLength;
-        char *insert = realloc(self->insertEnd - self->insertLength, newLength);
+static int insertIntoModification(struct buffer *self, int32_t index, int64_t insertOffset, const char *str, int64_t strLength) {
+    assert(strLength >= 0);
+    assert(index >= 0 && index < self->numModifications);
+
+    struct buffer_modification *modification = &self->modifications[index];
+    assert(insertOffset >= 0 && insertOffset <= modification->insertLength);
+
+    /* TODO: Needs to perform cursor corrections.
+    int64_t shortestLength = modification->intervalEnd - modification->intervalStart;
+    if (strLength < shortestLength) shortestLength = strLength;
+    
+    // Try to optimize if insertion at edges.
+    if (insertOffset == 0) {
+        int64_t i = 0;
+        for (; i < shortestLength; ++i) {
+            if (str[i] != self->text[modification->intervalStart + i]) break;
+        }
+        if (i) {
+            modification->intervalStart += i;
+            str += i;
+            strLength -= i;
+            if (strLength == 0) return 0;
+        }
+    } else if (insertOffset == modification->insertLength) {
+        int64_t i = 1;
+        for (; i <= shortestLength; ++i) {
+            if (str[strLength - i] != self->text[modification->intervalEnd - i]) break;
+        }
+        if (--i) {
+            modification->intervalEnd -= i;
+            strLength -= i;
+            if (strLength == 0) return 0;
+        }
+    }
+    */
+
+    if (modification->insertLength > 0) {
+        int64_t newLength = modification->insertLength + strLength;
+        char *insert = realloc(modification->insertEnd - modification->insertLength, newLength);
         if (!insert) return -1;
 
-        memmove(insert + insertOffset + strLength, insert + insertOffset, self->insertLength - insertOffset);
+        memmove(insert + insertOffset + strLength, insert + insertOffset, modification->insertLength - insertOffset);
         memcpy(insert + insertOffset, str, strLength);
-        self->insertEnd = insert + newLength; 
-        self->insertLength = newLength;
+        modification->insertEnd = insert + newLength;
+        modification->insertLength = newLength;
     } else {
-        assert(self->insertLength == 0);
+        assert(modification->insertLength == 0);
 
         char *insert = malloc(strLength);
         if (!insert) return -1;
 
         memcpy(insert, str, strLength);
-        self->insertEnd = insert + strLength;
-        self->insertLength = strLength;
+        modification->insertEnd = insert + strLength;
+        modification->insertLength = strLength;
     }
     return 0;
 }
@@ -158,68 +193,22 @@ static void deleteModificationAt(struct buffer *self, int32_t index) {
     --self->numModifications;
 }
 
-static void optimizeModification(struct buffer *self, int32_t index) {
-    struct buffer_modification *modification = &self->modifications[index];
-
-    const int64_t intervalLength = modification->intervalEnd - modification->intervalStart;
-    if (modification->insertLength != intervalLength) return;
-
-    char *insertStart = modification->insertEnd - modification->insertLength;
-    const char *intervalStart = &self->text[modification->intervalStart];
-
-    int64_t newLeft = 0;
-    while (1) {
-        if (newLeft == intervalLength) {
-            // The whole interval matches the whole insert.
-            buffer_modification_deinit(modification);
-            deleteModificationAt(self, index);
-            return;
-        }
-        if (intervalStart[newLeft] != insertStart[newLeft]) break;
-        ++newLeft;
-    }
-    assert(intervalLength > 0);
-
-    int64_t newRight = intervalLength;
-    while (intervalStart[newRight] == insertStart[newRight]) {
-        --newRight;
-    }
-    assert(newRight > newLeft);
-
-    const int64_t newLength = newRight - newLeft;
-    if (newLength != intervalLength) {
-        memmove(insertStart, insertStart + newLeft, newLength);
-
-        char *newInsertStart = realloc(insertStart, newLength);
-        if (!newInsertStart) {
-            newInsertStart = insertStart;
-        }
-
-        modification->insertLength = newLength;
-        modification->insertEnd = newInsertStart + newLength;
-        modification->intervalStart += newLeft;
-        modification->intervalEnd = modification->intervalStart + newLength;
-    }
-}
-
 int buffer_insertAtCursor(struct buffer *self, const char *str, int64_t strLength) {
     assert(strLength > 0);
     if (self->cursor.offset < 0) {
         struct buffer_modification *prevModification = &self->modifications[self->cursor.prevModificationIndex];
-        if (buffer_modification_insert(prevModification, prevModification->insertLength + self->cursor.offset, str, strLength) < 0) {
+        if (insertIntoModification(self, self->cursor.prevModificationIndex, prevModification->insertLength + self->cursor.offset, str, strLength) < 0) {
             return BUFFER_MEMORY_ALLOCATION_ERROR;
         }
         self->cursor.offset -= strLength;
-        optimizeModification(self, self->cursor.prevModificationIndex);
     } else {
         if (self->cursor.prevModificationIndex >= 0) {
             struct buffer_modification *prevModification = &self->modifications[self->cursor.prevModificationIndex];
             if (self->cursor.offset == prevModification->intervalEnd) {
-                if (buffer_modification_insert(prevModification, prevModification->insertLength, str, strLength) < 0) {
+                if (insertIntoModification(self, self->cursor.prevModificationIndex, prevModification->insertLength, str, strLength) < 0) {
                     return BUFFER_MEMORY_ALLOCATION_ERROR;
                 }
                 self->cursor.offset = -strLength;
-                optimizeModification(self, self->cursor.prevModificationIndex);
                 goto success;
             }
         }
@@ -242,5 +231,9 @@ int buffer_insertAtCursor(struct buffer *self, const char *str, int64_t strLengt
 }
 
 void buffer_deleteAtCursor(struct buffer *self, int64_t length) {
+    if (self->cursor.offset < 0) {
 
+    } else {
+
+    }
 }
