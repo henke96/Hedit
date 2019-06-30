@@ -12,6 +12,7 @@ struct buffer_modification {
 };
 
 struct buffer_cursor {
+    int64_t bufferOffset;
     int64_t offset;
     int32_t prevModificationIndex; // -1 if none.
 };
@@ -32,7 +33,12 @@ void buffer_moveCursor(struct buffer *self, int64_t offset);
 int buffer_insertAtCursor(struct buffer *self, const char *str, int64_t strLength);
 void buffer_deleteAtCursor(struct buffer *self, int64_t length);
 
+static inline void buffer_moveCursorTo(struct buffer *self, int64_t bufferOffset) {
+    buffer_moveCursor(self, bufferOffset - self->cursor.bufferOffset);
+}
+
 static inline char buffer_cursorNext(struct buffer *self) {
+    ++self->cursor.bufferOffset;
     ++self->cursor.offset;
     if (self->cursor.offset > 0) {
         int32_t next = self->cursor.prevModificationIndex + 1;
@@ -47,7 +53,7 @@ static inline char buffer_cursorNext(struct buffer *self) {
                 self->cursor.offset = -self->modifications[next].insertLength;
                 return self->modifications[next].insertEnd[self->cursor.offset];
             }
-        } 
+        }
     } else if (self->cursor.offset < 0) {
         return self->modifications[self->cursor.prevModificationIndex].insertEnd[self->cursor.offset];
     } else {

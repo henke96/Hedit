@@ -35,7 +35,7 @@ static int buffer_modification_insert(struct buffer_modification *self, int64_t 
         char *insert = realloc(self->insertEnd - self->insertLength, newLength);
         if (!insert) return -1;
 
-        memmove(insert + insertOffset + strLength, insert + insertOffset, strLength);
+        memmove(insert + insertOffset + strLength, insert + insertOffset, self->insertLength - insertOffset);
         memcpy(insert + insertOffset, str, strLength);
         self->insertEnd = insert + newLength; 
         self->insertLength = newLength;
@@ -70,6 +70,7 @@ void buffer_init(struct buffer *self, const char *text, int64_t textLength) {
     // Initialize cursor.
     self->cursor.offset = 0;
     self->cursor.prevModificationIndex = -1;
+    self->cursor.bufferOffset = 0;
 }
 
 void buffer_deinit(struct buffer *self) {
@@ -82,6 +83,9 @@ void buffer_deinit(struct buffer *self) {
 void buffer_setCursor(struct buffer *self, int64_t row, int64_t col);
 
 void buffer_moveCursor(struct buffer *self, int64_t offset) {
+    self->cursor.bufferOffset += offset;
+    assert(self->cursor.bufferOffset >= 0 && self->cursor.bufferOffset <= self->bufferLength);
+
     int64_t cursorOffset = self->cursor.offset + offset;
     if (offset >= 0) {
         if (self->cursor.offset < 0) {
@@ -150,11 +154,54 @@ static void deleteModificationAt(struct buffer *self, int32_t index) {
     if (modifications) {
         self->modifications = modifications;
     }
-    printf("nop\n");
     
     memmove(self->modifications + index, self->modifications + (index + 1), self->numModifications - (index + 1));
 
     --self->numModifications;
+}
+
+static void optimizeModification(struct buffer *self, int32_t index) {
+    struct buffer_modification *modification = &self->modifications[index];
+
+    const int64_t intervalLength = modification->intervalEnd - modification->intervalStart;
+    if (modification->insertLength == intervalLength) {
+        char *insertStart = modification->insertEnd - modification->insertLength;
+        const char *intervalStart = &self->text[modification->intervalStart];
+
+        int64_t newLeft = 0;
+        while (1) {
+            if (newLeft == intervalLength) {
+                // The whole interval matches the whole insert.
+                buffer_modification_deinit(modification);
+                deleteModificationAt(self, index);
+                return;
+            }
+            if (intervalStart[newLeft] != insertStart[newLeft]) break;
+            ++newLeft;
+        }
+        assert(intervalLength > 0);
+
+        int64_t newRight = intervalLength;
+        while (intervalStart[newRight] == insertStart[newRight]) {
+            --newRight;
+        }
+        assert(newRight > newLeft);
+
+        const int64_t newLength = newRight - newLeft;
+        if (newLength != intervalLength) {
+            memmove(insertStart, insertStart + newLeft, newLength);
+
+            char *newInsertStart = realloc(insertStart, newLength);
+            if (!newInsertStart) {
+                newInsertStart = insertStart;
+            }
+
+            modification->insertLength = newLength;
+            modification->insertEnd = newInsertStart + newLength;
+            modification->intervalStart += newLeft;
+            modification->intervalEnd = modification->intervalStart + newLength;
+        }
+    }
 }
 
 int buffer_insertAtCursor(struct buffer *self, const char *str, int64_t strLength) {
@@ -165,6 +212,7 @@ int buffer_insertAtCursor(struct buffer *self, const char *str, int64_t strLengt
             return BUFFER_MEMORY_ALLOCATION_ERROR;
         }
         self->cursor.offset -= strLength;
+        optimizeModification(self, self->cursor.prevModificationIndex);
     } else {
         if (self->cursor.prevModificationIndex >= 0) {
             struct buffer_modification *prevModification = &self->modifications[self->cursor.prevModificationIndex];
@@ -173,6 +221,7 @@ int buffer_insertAtCursor(struct buffer *self, const char *str, int64_t strLengt
                     return BUFFER_MEMORY_ALLOCATION_ERROR;
                 }
                 self->cursor.offset = -strLength;
+                optimizeModification(self, self->cursor.prevModificationIndex);
                 goto success;
             }
         }

@@ -4,12 +4,14 @@
 #include <stdio.h>
 
 void printBuffer(struct buffer *buffer) {
-    for (int64_t i = 0; i < buffer->bufferLength; ++i) {
+    int64_t i = buffer->bufferLength;
+    if (i) {
         printf("%c", buffer_getAtCursor(buffer));
-        buffer_moveCursor(buffer, 1);
-        //printf("%d %d\n", i, buffer->cursor.offset);
+        while (--i) {
+            printf("%c", buffer_cursorNext(buffer));
+        }
     }
-    buffer_moveCursor(buffer, -buffer->bufferLength);
+    buffer_moveCursorTo(buffer, 0);
     printf("\n");
 }
 
@@ -41,7 +43,12 @@ void test2(void) {
 
     buffer_moveCursor(&buffer, 28);
     buffer_insertAtCursor(&buffer, " wooo", 5);
-    buffer_moveCursor(&buffer, -28);
+    buffer_moveCursorTo(&buffer, 0);
+    printBuffer(&buffer);
+
+    buffer_moveCursorTo(&buffer, 15);
+    buffer_insertAtCursor(&buffer, "s", 1);
+    buffer_moveCursor(&buffer, -15);
     printBuffer(&buffer);
 
     printf("%d %d\n", buffer.numModifications, buffer.bufferLength);
