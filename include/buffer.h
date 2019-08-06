@@ -18,54 +18,74 @@ struct buffer_cursor {
 };
 
 struct buffer {
-    struct buffer_cursor cursor;
     const char *text;
     int64_t textLength;
-    struct buffer_modification *modifications;
-    int32_t numModifications;
     int64_t bufferLength;
+    struct buffer_modification *modifications;
+    struct buffer_cursor **registeredCursors;
+    int32_t numModifications;
+    int32_t registeredCursorsCapacity;
 };
 
 void buffer_init(struct buffer *self, const char *text, int64_t textLength);
 void buffer_deinit(struct buffer *self);
 
-void buffer_moveCursor(struct buffer *self, int64_t offset);
-int buffer_insertAtCursor(struct buffer *self, const char *str, int64_t strLength);
-void buffer_deleteAtCursor(struct buffer *self, int64_t length);
+int buffer_registerCursor(struct buffer *self, struct buffer_cursor *cursor);
+void buffer_unregisterCursor(struct buffer *self, struct buffer_cursor *cursor);
 
-static inline void buffer_moveCursorTo(struct buffer *self, int64_t bufferOffset) {
-    buffer_moveCursor(self, bufferOffset - self->cursor.bufferOffset);
+void buffer_moveCursor(struct buffer *self, struct buffer_cursor *cursor, int64_t offset);
+int buffer_insertAtCursor(struct buffer *self, const struct buffer_cursor *cursor, const char *str, int64_t strLength);
+int buffer_deleteAtCursor(struct buffer *self, struct buffer_cursor *cursor, int64_t length);
+
+static inline void buffer_moveCursorTo(struct buffer *self, struct buffer_cursor *cursor, int64_t bufferOffset) {
+    buffer_moveCursor(self, cursor, bufferOffset - cursor->bufferOffset);
 }
 
-static inline char buffer_cursorNext(struct buffer *self) {
-    ++self->cursor.bufferOffset;
-    ++self->cursor.offset;
-    if (self->cursor.offset > 0) {
-        int32_t next = self->cursor.prevModificationIndex + 1;
-        if (
-            next < self->numModifications &&
-            self->cursor.offset >= self->modifications[next].intervalStart
-        ) {
-            self->cursor.prevModificationIndex = next;
-            if (self->modifications[next].insertLength == 0) {
-                self->cursor.offset = self->modifications[next].intervalEnd;
+static inline char buffer_cursorNext(struct buffer *self, struct buffer_cursor *cursor) {
+    ++cursor->bufferOffset;
+    assert(cursor->bufferOffset <= self->bufferLength);
+    ++cursor->offset;
+    if (cursor->offset >= 0) {
+        while (1) {
+            if (cursor->offset == 0) {
+                cursor->offset = self->modifications[cursor->prevModificationIndex].intervalEnd;
+            }
+            int32_t next = cursor->prevModificationIndex + 1;
+            if (
+                next < self->numModifications &&
+                cursor->offset >= self->modifications[next].intervalStart
+            ) {
+                cursor->prevModificationIndex = next;
+                cursor->offset = -self->modifications[next].insertLength;
+                if (cursor->offset != 0) {
+                    assert(cursor->offset < 0);
+                    return self->modifications[next].insertEnd[cursor->offset];
+                }
             } else {
-                self->cursor.offset = -self->modifications[next].insertLength;
-                return self->modifications[next].insertEnd[self->cursor.offset];
+                assert(cursor->offset >= 0);
+                return self->text[cursor->offset];
             }
         }
-    } else if (self->cursor.offset < 0) {
-        return self->modifications[self->cursor.prevModificationIndex].insertEnd[self->cursor.offset];
     } else {
-        self->cursor.offset = self->modifications[self->cursor.prevModificationIndex].intervalEnd;
+        return self->modifications[cursor->prevModificationIndex].insertEnd[cursor->offset];
     }
-    return self->text[self->cursor.offset];
 }
 
-static inline char buffer_getAtCursor(const struct buffer *self) {
-    if (self->cursor.offset < 0) {
-        return self->modifications[self->cursor.prevModificationIndex].insertEnd[self->cursor.offset];
+static inline char buffer_getAtCursor(const struct buffer *self, struct buffer_cursor *cursor) {
+    if (cursor->offset < 0) {
+        return self->modifications[cursor->prevModificationIndex].insertEnd[cursor->offset];
     } else {
-        return self->text[self->cursor.offset];
+        return self->text[cursor->offset];
     }
+}
+
+static inline void buffer_cursor_init_copy(struct buffer_cursor *self, const struct buffer_cursor *copyFrom) {
+    *self = *copyFrom;
+}
+
+static inline void buffer_cursor_init(struct buffer_cursor *self, struct buffer *buffer) {
+    self->bufferOffset = 0;
+    self->offset = 0;
+    self->prevModificationIndex = -1;
+    buffer_moveCursor(buffer, self, 0); // Fix offset incase there's a modification at the start.
 }
