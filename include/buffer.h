@@ -33,15 +33,19 @@ void buffer_deinit(struct buffer *self);
 int buffer_registerCursor(struct buffer *self, struct buffer_cursor *cursor);
 void buffer_unregisterCursor(struct buffer *self, struct buffer_cursor *cursor);
 
-void buffer_moveCursor(struct buffer *self, struct buffer_cursor *cursor, int64_t offset);
+void buffer_moveCursor(const struct buffer *self, struct buffer_cursor *cursor, int64_t offset);
 int buffer_insertAtCursor(struct buffer *self, const struct buffer_cursor *cursor, const char *str, int64_t strLength);
-int buffer_deleteAtCursor(struct buffer *self, struct buffer_cursor *cursor, int64_t length);
+int buffer_deleteAtCursor(struct buffer *self, const struct buffer_cursor *cursor, int64_t length);
+
+static inline int64_t buffer_getLength(const struct buffer *self) {
+    return self->bufferLength;
+}
 
 static inline void buffer_moveCursorTo(struct buffer *self, struct buffer_cursor *cursor, int64_t bufferOffset) {
     buffer_moveCursor(self, cursor, bufferOffset - cursor->bufferOffset);
 }
 
-static inline char buffer_cursorNext(struct buffer *self, struct buffer_cursor *cursor) {
+static inline char buffer_cursorNext(const struct buffer *self, struct buffer_cursor *cursor) {
     ++cursor->bufferOffset;
     assert(cursor->bufferOffset <= self->bufferLength);
     ++cursor->offset;
@@ -83,9 +87,13 @@ static inline void buffer_cursor_initCopy(struct buffer_cursor *self, const stru
     *self = *copyFrom;
 }
 
-static inline void buffer_cursor_init(struct buffer_cursor *self, struct buffer *buffer) {
+static inline void buffer_cursor_init(struct buffer_cursor *self, const struct buffer *buffer) {
     self->bufferOffset = 0;
     self->offset = 0;
     self->prevModificationIndex = -1;
     buffer_moveCursor(buffer, self, 0); // Fix offset incase there's a modification at the start.
+}
+
+static inline int64_t buffer_cursor_getOffset(const struct buffer_cursor *self) {
+    return self->bufferOffset;
 }

@@ -292,7 +292,7 @@ void buffer_unregisterCursor(struct buffer *self, struct buffer_cursor *cursor) 
     assert(0);
 }
 
-void buffer_moveCursor(struct buffer *self, struct buffer_cursor *cursor, int64_t offset) {
+void buffer_moveCursor(const struct buffer *self, struct buffer_cursor *cursor, int64_t offset) {
     cursor->bufferOffset += offset;
     assert(cursor->bufferOffset >= 0 && cursor->bufferOffset <= self->bufferLength);
 
@@ -402,7 +402,7 @@ int buffer_insertAtCursor(struct buffer *self, const struct buffer_cursor *curso
     return 0;
 }
 
-int buffer_deleteAtCursor(struct buffer *self, struct buffer_cursor *cursor, const int64_t length) {
+int buffer_deleteAtCursor(struct buffer *self, const struct buffer_cursor *cursor, const int64_t length) {
     int64_t deletedLength = 0;
     while (deletedLength < length) {
         int64_t remaining = length - deletedLength;
