@@ -50,14 +50,34 @@ static int insertModificationAt(struct buffer *self, int32_t index) {
 }
 
 static void deleteModificationAt(struct buffer *self, int32_t index) {
-    memmove(self->modifications + index, self->modifications + (index + 1), sizeof(self->modifications[0]) * (self->numModifications - (index + 1)));
+    if (self->numModifications > 1) {
+        memmove(self->modifications + index, self->modifications + (index + 1), sizeof(self->modifications[0]) * (self->numModifications - (index + 1)));
 
-    struct buffer_modification *modifications = realloc(self->modifications, sizeof(modifications[0]) * (self->numModifications - 1));
-    if (modifications) {
-        self->modifications = modifications;
+        struct buffer_modification *modifications = realloc(self->modifications, sizeof(modifications[0]) * (self->numModifications - 1));
+        if (modifications) {
+            self->modifications = modifications;
+        }
+    } else {
+        free(self->modifications);
+        self->modifications = NULL;
+    }
+    --self->numModifications;
+}
+
+static void deleteModificationProperly(struct buffer *self, int32_t index) {
+    // Correct prevModificationIndex for all cursors.
+    for (int32_t i = 0; i < self->registeredCursorsCapacity; ++i) {
+        struct buffer_cursor *cursor = self->registeredCursors[i];
+        if (cursor != NULL) {
+            if (cursor->prevModificationIndex >= index) {
+                // Past the deleted modification.
+                --cursor->prevModificationIndex;
+            }
+        }
     }
 
-    --self->numModifications;
+    buffer_modification_deinit(&self->modifications[index]);
+    deleteModificationAt(self, index);
 }
 
 static int insertIntoModification(struct buffer *self, int32_t index, int64_t cursorOffset, const char *str, int64_t strLength) {
@@ -69,36 +89,42 @@ static int insertIntoModification(struct buffer *self, int32_t index, int64_t cu
     int64_t insertOffset = cursorOffset + modification->insertLength;
     assert(insertOffset >= 0 && insertOffset <= modification->insertLength);
 
-
-
-    /* TODO: Needs to perform cursor corrections.
+    // Try to optimize if insertion at edges.
     int64_t shortestLength = modification->intervalEnd - modification->intervalStart;
     if (strLength < shortestLength) shortestLength = strLength;
-    
-    // Try to optimize if insertion at edges.
+
     if (insertOffset == 0) {
         int64_t i = 0;
         for (; i < shortestLength; ++i) {
             if (str[i] != self->text[modification->intervalStart + i]) break;
         }
-        if (i) {
+        if (i != 0) {
             modification->intervalStart += i;
             str += i;
             strLength -= i;
-            if (strLength == 0) return 0;
         }
     } else if (insertOffset == modification->insertLength) {
         int64_t i = 1;
         for (; i <= shortestLength; ++i) {
             if (str[strLength - i] != self->text[modification->intervalEnd - i]) break;
         }
-        if (--i) {
+        if (--i != 0) {
             modification->intervalEnd -= i;
             strLength -= i;
-            if (strLength == 0) return 0;
         }
     }
-    */
+
+    // Check if nothing left to be done.
+    if (strLength == 0) {
+        if (
+            modification->insertLength == 0 &&
+            modification->intervalStart == modification->intervalEnd
+        ) {
+            // The insertion optimization must've reduced the interval to be empty.
+            deleteModificationProperly(self, index);
+        }
+        return 0;
+    }
 
     if (modification->insertLength > 0) {
         // Insert into existing insertion.
@@ -168,21 +194,8 @@ static void deleteFromModification(struct buffer *self, int32_t index, int64_t c
         }
 
         if (modification->intervalEnd - modification->intervalStart == 0) {
-            // This modification doesn't remove or insert any text.
-
-            // Correct prevModificationIndex for all cursors.
-            for (int32_t i = 0; i < self->registeredCursorsCapacity; ++i) {
-                struct buffer_cursor *cursor = self->registeredCursors[i];
-                if (cursor != NULL) {
-                    if (cursor->prevModificationIndex >= index) {
-                        // Past the deleted modification.
-                        --cursor->prevModificationIndex;
-                    }
-                }
-            }
-
-            buffer_modification_deinit(modification);
-            deleteModificationAt(self, index);
+            // This modification doesn't remove or insert any text. Delete it.
+            deleteModificationProperly(self, index);
         } else {
             // It removes text, but doesn't insert any.
             free(oldInsert);
