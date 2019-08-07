@@ -19,6 +19,39 @@ void printBuffer(struct buffer *buffer, struct buffer_cursor *cursor) {
     printf("\n");
 }
 
+void printBufferData(struct buffer *buffer) {
+    printf("Printing buffer data:\n\tLen: %d, Orig len: %d, Num modifications: %d\n\tText:\n", buffer->bufferLength, buffer->textLength, buffer->numModifications);
+    int32_t nextModificationIndex = 0;
+    int64_t textOffset = 0;
+    while (1) {
+        if (nextModificationIndex < buffer->numModifications) {
+            struct buffer_modification *nextModification = &buffer->modifications[nextModificationIndex];
+            if (nextModification->intervalStart > textOffset) {
+                printf(
+                    "\t\t'%.*s'\n",
+                    nextModification->intervalStart - textOffset, &buffer->text[textOffset]
+                );
+            }
+            printf(
+                "\t\tModification %d: '%.*s' -> '%.*s'\n",
+                nextModificationIndex,
+                nextModification->intervalEnd - nextModification->intervalStart, &buffer->text[nextModification->intervalStart],
+                nextModification->insertLength, nextModification->insertEnd - nextModification->insertLength
+            );
+            ++nextModificationIndex;
+            textOffset = nextModification->intervalEnd;
+        } else {
+            if (buffer->textLength - textOffset > 0) {
+                printf(
+                    "\t\t'%.*s'\n",
+                    buffer->textLength - textOffset, &buffer->text[textOffset]
+                );
+            }
+            break;
+        }
+    }
+}
+
 void test2(void) {
     struct buffer buffer;
     buffer_init(&buffer, "Hello world!", 12);
@@ -39,10 +72,14 @@ void test2(void) {
     buffer_moveCursorTo(&buffer, &cursor, 0);
     printBuffer(&buffer, &printCursor);
 
+    printBufferData(&buffer);
+
     buffer_insertAtCursor(&buffer, &cursor, "Hel", 3);
     buffer_moveCursorTo(&buffer, &cursor, 0);
     buffer_moveCursorTo(&buffer, &printCursor, 0);
     printBuffer(&buffer, &printCursor);
+
+    printBufferData(&buffer);
 
     // Start
     
@@ -91,7 +128,7 @@ void test2(void) {
     buffer_moveCursorTo(&buffer, &cursor, 0);
     printBuffer(&buffer, &printCursor);
 
-    printf("%d %d\n", buffer.numModifications, buffer.bufferLength);
+    printBufferData(&buffer);
     // Start undoing
 
     buffer_moveCursorTo(&buffer, &cursor, 1);
@@ -135,7 +172,7 @@ void test2(void) {
     buffer_deleteAtCursor(&buffer, &cursor, 1);
     printBuffer(&buffer, &printCursor);
 
-    printf("%d %d\n", buffer.numModifications, buffer.bufferLength);
+    printBufferData(&buffer);
 
     buffer_unregisterCursor(&buffer, &cursor);
     buffer_unregisterCursor(&buffer, &printCursor);
