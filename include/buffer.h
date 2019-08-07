@@ -79,7 +79,7 @@ static inline char buffer_getAtCursor(const struct buffer *self, struct buffer_c
     }
 }
 
-static inline void buffer_cursor_init_copy(struct buffer_cursor *self, const struct buffer_cursor *copyFrom) {
+static inline void buffer_cursor_initCopy(struct buffer_cursor *self, const struct buffer_cursor *copyFrom) {
     *self = *copyFrom;
 }
 

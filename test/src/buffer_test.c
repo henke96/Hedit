@@ -4,6 +4,6 @@
 struct testResult buffer_test_simple(void) {
     struct testResult result;
 
-    testResult_init_fail(&result, "buffer_test_simple", __FILE__, __LINE__, "uh oh");
+    testResult_initFail(&result, "buffer_test_simple", __FILE__, __LINE__, "uh oh");
     return result;
 }

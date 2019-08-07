@@ -6,7 +6,7 @@
 
 void printBuffer(struct buffer *buffer, struct buffer_cursor *cursor) {
     struct buffer_cursor cursorCopy;
-    buffer_cursor_init_copy(&cursorCopy, cursor);
+    buffer_cursor_initCopy(&cursorCopy, cursor);
 
     int64_t i = buffer->bufferLength - cursorCopy.bufferOffset;
     if (i) {

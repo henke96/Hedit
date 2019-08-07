@@ -10,12 +10,12 @@ struct testResult {
     int line;
 };
 
-static inline void testResult_init_success(struct testResult *self, const char *name) {
+static inline void testResult_initSuccess(struct testResult *self, const char *name) {
     self->name = name;
     self->success = true;
 }
 
-static inline void testResult_init_fail(struct testResult *self, const char *name, const char *file, int line, const char *message) {
+static inline void testResult_initFail(struct testResult *self, const char *name, const char *file, int line, const char *message) {
     self->name = name;
     self->success = false;
     self->file = file;
