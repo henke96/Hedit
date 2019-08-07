@@ -13,16 +13,23 @@ const target = Target{
     },
 };
 
-const include_dirs = [_][]const u8{"include"};
-
 const system_libraries = [_][]const u8{"c"};
+
+const c_include_dirs = struct {
+    const general_dirs = [_][]const u8{"include"};
+    const main_dirs = general_dirs;
+    const test_dirs = general_dirs ++ [_][]const u8{"test/include"};
+};
 
 const c_sources = struct {
     const general_sources = [_][]const u8{"src/buffer.c"};
 
     const main_sources = general_sources ++ [_][]const u8{"src/main.c"};
 
-    const test_sources = general_sources ++ [_][]const u8{"test/test.c"};
+    const test_sources = general_sources ++ [_][]const u8{
+        "test/src/test.c",
+        "test/src/buffer_test.c",
+    };
 };
 
 const c_flags = struct {
@@ -65,7 +72,7 @@ fn buildMainProgram(b: *Builder) void {
         }
     }
 
-    for (include_dirs) |include_dir| {
+    for (c_include_dirs.main_dirs) |include_dir| {
         exe.addIncludeDir(include_dir);
     }
 
@@ -94,14 +101,13 @@ fn buildTestProgram(b: *Builder) void {
         exe.addCSourceFile(source, c_flags.test_flags);
     }
 
-    for (include_dirs) |include_dir| {
+    for (c_include_dirs.test_dirs) |include_dir| {
         exe.addIncludeDir(include_dir);
     }
 
     for (system_libraries) |library| {
         exe.linkSystemLibrary(library);
     }
-    exe.install();
 
     // Run step.
     const run_cmd = exe.run();
