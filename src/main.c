@@ -1,5 +1,6 @@
 #include "buffer.h"
 
+#include <inttypes.h>
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -20,7 +21,7 @@ void printBuffer(struct buffer *buffer, struct buffer_cursor *cursor) {
 }
 
 void printBufferData(struct buffer *buffer) {
-    printf("Printing buffer data:\n\tLen: %d, Orig len: %d, Num modifications: %d\n\tText:\n", buffer->bufferLength, buffer->textLength, buffer->numModifications);
+    printf("Printing buffer data:\n\tLen: %" PRId64 ", Orig len: %" PRId64 ", Num modifications: %" PRId32 "\n\tText:\n", buffer->bufferLength, buffer->textLength, buffer->numModifications);
     int32_t nextModificationIndex = 0;
     int64_t textOffset = 0;
     while (1) {
@@ -29,14 +30,14 @@ void printBufferData(struct buffer *buffer) {
             if (nextModification->intervalStart > textOffset) {
                 printf(
                     "\t\t'%.*s'\n",
-                    nextModification->intervalStart - textOffset, &buffer->text[textOffset]
+                    (int)(nextModification->intervalStart - textOffset), &buffer->text[textOffset]
                 );
             }
             printf(
-                "\t\tModification %d: '%.*s' -> '%.*s'\n",
+                "\t\tModification %" PRId32 ": '%.*s' -> '%.*s'\n",
                 nextModificationIndex,
-                nextModification->intervalEnd - nextModification->intervalStart, &buffer->text[nextModification->intervalStart],
-                nextModification->insertLength, nextModification->insertEnd - nextModification->insertLength
+                (int)(nextModification->intervalEnd - nextModification->intervalStart), &buffer->text[nextModification->intervalStart],
+                (int)nextModification->insertLength, nextModification->insertEnd - nextModification->insertLength
             );
             ++nextModificationIndex;
             textOffset = nextModification->intervalEnd;
@@ -44,7 +45,7 @@ void printBufferData(struct buffer *buffer) {
             if (buffer->textLength - textOffset > 0) {
                 printf(
                     "\t\t'%.*s'\n",
-                    buffer->textLength - textOffset, &buffer->text[textOffset]
+                    (int)(buffer->textLength - textOffset), &buffer->text[textOffset]
                 );
             }
             break;
