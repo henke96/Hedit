@@ -10,12 +10,13 @@
 
 static test_function_t *tests[] = {
     buffer_test_simple,
+    buffer_test_simpleMultiCursor
 };
 
-#define NUM_TESTS (int)(sizeof(tests)/sizeof(tests[0]))
+#define NUM_TESTS (int32_t)(sizeof(tests)/sizeof(tests[0]))
 
-void printTestFail(const char *name, const char *file, int line) {
-    printf("Test '%s' FAILED! (%s:%d)\n", name, file, line);
+void printTestFail(const char *name, const char *file, int32_t line) {
+    printf("Test '%s' FAILED! (%s:%" PRId32 ")\n", name, file, line);
 }
 
 int main(int argc, char **argv) {
@@ -29,7 +30,7 @@ int main(int argc, char **argv) {
         return 0;
     }
 
-    printf("Running %d %s...\n\n", NUM_TESTS, numTestString);
+    printf("Running %" PRId32 " %s...\n\n", NUM_TESTS, numTestString);
 
     for (int32_t i = 0; i < NUM_TESTS; ++i) {
         struct test_result result = tests[i]();
@@ -44,13 +45,13 @@ int main(int argc, char **argv) {
     printf("\n");
 
     if (numFailed == 0) {
-        printf("All tests passed! (%d %s)\n", NUM_TESTS, numTestString);
+        printf("All tests passed! (%" PRId32 " %s)\n", NUM_TESTS, numTestString);
     } else {
         const char *numFailedString = "tests";
         if (numFailed == 1) {
             numFailedString = "test";
         }
-        printf("%d %s failed! (Out of %d %s)\n", numFailed, numFailedString, NUM_TESTS, numTestString);
+        printf("%d %s failed! (Out of %" PRId32 " %s)\n", numFailed, numFailedString, NUM_TESTS, numTestString);
     }
     return 0;
 }

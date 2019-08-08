@@ -448,6 +448,8 @@ int buffer_deleteAtCursor(struct buffer *self, const struct buffer_cursor *curso
                 }
             }
             // Couldn't merge into next, so this is guaranteed to be the last iteration.
+            deletedLength += length;
+
             if (cursor->prevModificationIndex >= 0) {
                 struct buffer_modification *prevModification = &self->modifications[cursor->prevModificationIndex];
                 if (cursor->offset == prevModification->intervalEnd) {
