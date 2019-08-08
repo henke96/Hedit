@@ -124,15 +124,17 @@ struct test_result buffer_test_simpleMultiCursor(void) {
         currentCursorOffset += 7;
     }
 
-    if (!assertBufferContents(
-        &buffer,
-        "world!\n"
-        "world!\n"
-        "world!\n"
-        "world!\n"
-        "world!\n",
-        testName,
-        __LINE__)
+    if (
+        !assertBufferContents(
+            &buffer,
+            "world!\n"
+            "world!\n"
+            "world!\n"
+            "world!\n"
+            "world!\n",
+            testName,
+            __LINE__
+        )
     ) return test_result_create(false, testName);
 
     for (int i = 0; i < simpleMultiCursor_NUM_CURSORS; ++i) {
@@ -172,15 +174,17 @@ struct test_result buffer_test_simpleMultiCursor(void) {
         buffer_insertAtCursor(&buffer, &cursors[i], "W", 1);
     }
 
-    if (!assertBufferContents(
-        &buffer,
-        "World tour"
-        "World tour"
-        "World tour"
-        "World tour"
-        "World tour",
-        testName,
-        __LINE__)
+    if (
+        !assertBufferContents(
+            &buffer,
+            "World tour"
+            "World tour"
+            "World tour"
+            "World tour"
+            "World tour",
+            testName,
+            __LINE__
+        )
     ) return test_result_create(false, testName);
 
     return test_result_create(true, testName);
