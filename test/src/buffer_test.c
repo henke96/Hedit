@@ -14,7 +14,7 @@ static bool assertBufferContents(const struct buffer *buffer, const char *conten
         if (bufferLength != 0) {
             int64_t i = 0;
             char c = buffer_getAtCursor(buffer, &cursor);
-            while(1) {
+            while (1) {
                 if (c != content[i]) goto fail;
                 if (++i == bufferLength) break;
                 c = buffer_cursorNext(buffer, &cursor);
@@ -34,7 +34,7 @@ static bool assertBufferContents(const struct buffer *buffer, const char *conten
         buffer_cursor_init(&cursor, buffer);
         int64_t i = 0;
         char c = buffer_getAtCursor(buffer, &cursor);
-        while(1) {
+        while (1) {
             printf("%c", c);
             if (++i == bufferLength) break;
             c = buffer_cursorNext(buffer, &cursor);
