@@ -8,7 +8,7 @@ const warn = @import("std").debug.warn;
 const target = Target{
     .Cross = CrossTarget{
         .arch = builtin.Arch.x86_64,
-        .os = builtin.Os.windows,
+        .os = builtin.Os.linux,
         .abi = builtin.Abi.gnu,
     },
 };
@@ -25,6 +25,9 @@ const c_sources = struct {
     const general_sources = [_][]const u8{"src/buffer.c"};
 
     const main_sources = general_sources ++ [_][]const u8{"src/main.c"};
+    const main_windows_sources = main_sources ++ [_][]const u8{"src/file/windows/fileMapping.c"};
+    const main_linux_sources = main_sources ++ [_][]const u8{"src/file/linux/fileMapping.c"};
+    const main_other_sources = main_sources ++ [_][]const u8{"src/file/other/fileMapping.c"};
 
     const test_sources = general_sources ++ [_][]const u8{
         "test/src/test.c",
@@ -64,11 +67,29 @@ fn buildMainProgram(b: *Builder) void {
 
     exe.setTheTarget(target);
 
-    for (c_sources.main_sources) |source| {
-        if (b.is_release) {
-            exe.addCSourceFile(source, c_flags.release_flags);
-        } else {
-            exe.addCSourceFile(source, c_flags.debug_flags);
+    if (target.Cross.os == builtin.Os.windows) {
+        for (c_sources.main_windows_sources) |source| {
+            if (b.is_release) {
+                exe.addCSourceFile(source, c_flags.release_flags);
+            } else {
+                exe.addCSourceFile(source, c_flags.debug_flags);
+            }
+        }
+    } else if (target.Cross.os == builtin.Os.linux) {
+        for (c_sources.main_linux_sources) |source| {
+            if (b.is_release) {
+                exe.addCSourceFile(source, c_flags.release_flags);
+            } else {
+                exe.addCSourceFile(source, c_flags.debug_flags);
+            }
+        }
+    } else {
+        for (c_sources.main_other_sources) |source| {
+            if (b.is_release) {
+                exe.addCSourceFile(source, c_flags.release_flags);
+            } else {
+                exe.addCSourceFile(source, c_flags.debug_flags);
+            }
         }
     }
 
@@ -119,3 +140,4 @@ pub fn build(b: *Builder) void {
     buildMainProgram(b);
     buildTestProgram(b);
 }
+

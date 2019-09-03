@@ -1,11 +1,9 @@
 #include "buffer.h"
+#include "file/fileMapping.h"
 
 #include <inttypes.h>
 #include <stdlib.h>
 #include <stdio.h>
-
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
 
 void printBuffer(struct buffer *buffer, struct buffer_cursor *cursor) {
     struct buffer_cursor cursorCopy;
@@ -57,8 +55,13 @@ void printBufferData(struct buffer *buffer) {
 }
 
 void test2(void) {
+    struct fileMapping fileMapping;
+    if (fileMapping_init(&fileMapping, "test.txt") < 0) {
+        return;
+    }
+
     struct buffer buffer;
-    buffer_init(&buffer, "Hello world!", 12);
+    buffer_init(&buffer, fileMapping_getContent(&fileMapping), fileMapping_getContentSize(&fileMapping));
 
     struct buffer_cursor cursor;
     buffer_cursor_init(&cursor, &buffer);
@@ -181,69 +184,10 @@ void test2(void) {
     buffer_unregisterCursor(&buffer, &cursor);
     buffer_unregisterCursor(&buffer, &printCursor);
     buffer_deinit(&buffer);
-    
+    fileMapping_deinit(&fileMapping);
 }
-/*
-void testFileMapping(void) {
-    char temp[1000];
-
-    GetCurrentDirectoryA(1000, &temp[0]);
-    printf("%s\n", temp);
-
-    HANDLE hFile = CreateFileA(
-        "test.txt",
-        GENERIC_READ,
-        FILE_SHARE_READ,
-        NULL,
-        OPEN_EXISTING,
-        FILE_ATTRIBUTE_NORMAL,
-        NULL
-    );
-    if (hFile == INVALID_HANDLE_VALUE) {
-        printf("File create error: %lu\n", GetLastError());
-        return;
-    }
-
-    HANDLE hFileMapping = CreateFileMappingA(
-        hFile,
-        NULL,
-        PAGE_READONLY,
-        0,
-        0,
-        NULL
-    );
-
-    if (hFileMapping == NULL) {
-        printf("File mapping error: %lu\n", GetLastError());
-        return;
-    }
-
-    char *content = MapViewOfFile(
-        hFileMapping,
-        FILE_MAP_READ,
-        0,
-        0,
-        0
-    );
-
-    if (content == NULL) {
-        printf("File vieww error: %lu\n", GetLastError());
-        return;
-    }
-
-    LARGE_INTEGER fileSize;
-    GetFileSizeEx(hFile, &fileSize);
-    for (int i = 0; i < fileSize.QuadPart; ++i)
-        printf("%c", content[i]);
-    printf("\n");
-
-    UnmapViewOfFile(content);
-    CloseHandle(hFileMapping);
-    CloseHandle(hFile);
-}*/
 
 int main(int argc, char **argv) {
-    //testFileMapping();
     test2();
     return 0;
 }

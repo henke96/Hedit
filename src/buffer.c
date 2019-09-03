@@ -353,7 +353,7 @@ int buffer_insertAtCursor(struct buffer *self, const struct buffer_cursor *curso
     if (cursor->offset < 0) {
         // Insert into current modification.
         if (insertIntoModification(self, cursor->prevModificationIndex, cursor->offset, str, strLength) < 0) {
-            return BUFFER_MEMORY_ALLOCATION_ERROR;
+            return buffer_MEMORY_ALLOCATION_ERROR;
         }
     } else if (
         cursor->prevModificationIndex >= 0 &&
@@ -361,18 +361,18 @@ int buffer_insertAtCursor(struct buffer *self, const struct buffer_cursor *curso
     ) {
         // Can append to previous modification.
         if (insertIntoModification(self, cursor->prevModificationIndex, 0, str, strLength) < 0) {
-            return BUFFER_MEMORY_ALLOCATION_ERROR;
+            return buffer_MEMORY_ALLOCATION_ERROR;
         }
     } else {
         // Create a new modification.
         int32_t newModificationIndex = cursor->prevModificationIndex + 1;
         if (insertModificationAt(self, newModificationIndex) < 0) {
-            return BUFFER_MEMORY_ALLOCATION_ERROR;
+            return buffer_MEMORY_ALLOCATION_ERROR;
         }
 
         if (buffer_modification_init(&self->modifications[newModificationIndex], cursor->offset, 0, strLength, str) < 0) {
             deleteModificationAt(self, newModificationIndex);
-            return BUFFER_MEMORY_ALLOCATION_ERROR;
+            return buffer_MEMORY_ALLOCATION_ERROR;
         }
 
         // Correct prevModificationIndex for all cursors.
@@ -476,11 +476,11 @@ int buffer_deleteAtCursor(struct buffer *self, const struct buffer_cursor *curso
             // Couldn't merge into prev either, so create new modification.
             int32_t newModificationIndex = cursor->prevModificationIndex + 1;
             if (insertModificationAt(self, newModificationIndex) < 0) {
-                return BUFFER_MEMORY_ALLOCATION_ERROR;
+                return buffer_MEMORY_ALLOCATION_ERROR;
             }
             if (buffer_modification_init(&self->modifications[newModificationIndex], cursor->offset, remaining, 0, NULL) < 0) {
                 deleteModificationAt(self, newModificationIndex);
-                return BUFFER_MEMORY_ALLOCATION_ERROR;
+                return buffer_MEMORY_ALLOCATION_ERROR;
             }
 
             // Correct all cursors.

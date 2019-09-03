@@ -2,7 +2,7 @@
 #include <inttypes.h>
 #include <assert.h>
 
-#define BUFFER_MEMORY_ALLOCATION_ERROR -1
+#define buffer_MEMORY_ALLOCATION_ERROR -1
 
 struct buffer_modification {
     int64_t intervalStart;
