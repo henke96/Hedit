@@ -30,6 +30,8 @@ struct buffer {
 void buffer_init(struct buffer *self, const char *text, int64_t textLength);
 void buffer_deinit(struct buffer *self);
 
+int buffer_writeToFile(const struct buffer *self, const char *path);
+
 int buffer_registerCursor(struct buffer *self, struct buffer_cursor *cursor);
 void buffer_unregisterCursor(struct buffer *self, struct buffer_cursor *cursor);
 

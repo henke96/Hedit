@@ -22,7 +22,10 @@ const c_include_dirs = struct {
 };
 
 const c_sources = struct {
-    const general_sources = [_][]const u8{"src/buffer.c"};
+    const general_sources = [_][]const u8{
+        "src/buffer.c",
+        "src/file/fileWriter.c",
+    };
 
     const main_sources = general_sources ++ [_][]const u8{"src/main.c"};
     const main_windows_sources = main_sources ++ [_][]const u8{"src/file/windows/fileMapping.c"};
