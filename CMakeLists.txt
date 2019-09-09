@@ -4,6 +4,7 @@ project(Hedit)
 # General sources.
 set(general_sources
     "src/buffer.c"
+    "src/file/fileWriter.c"
 )
 
 # Platform specific sources.
