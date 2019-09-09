@@ -183,6 +183,9 @@ void test2(void) {
 
     buffer_unregisterCursor(&buffer, &cursor);
     buffer_unregisterCursor(&buffer, &printCursor);
+
+    buffer_writeToFile(&buffer, "out.txt");
+
     buffer_deinit(&buffer);
     fileMapping_deinit(&fileMapping);
 }

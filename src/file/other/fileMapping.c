@@ -5,7 +5,7 @@
 #include <assert.h>
 
 int fileMapping_init(struct fileMapping *self, const char *path) {
-    FILE *handle = fopen(path, "r");
+    FILE *handle = fopen(path, "rb");
     if (handle == NULL) {
         return fileMapping_init_FILE_READING_ERROR;
     }
