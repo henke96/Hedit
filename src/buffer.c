@@ -1,5 +1,4 @@
 #include "buffer.h"
-#include "file/fileWriter.h"
 
 #include <malloc.h>
 #include <string.h>
@@ -296,6 +295,32 @@ void buffer_unregisterCursor(struct buffer *self, struct buffer_cursor *cursor) 
     assert(0);
 }
 
+struct bufferChunk buffer_getCursorChunk(const struct buffer *self, const struct buffer_cursor *cursor) {
+    struct bufferChunk chunk;
+    if (cursor->offset < 0) {
+        struct buffer_modification *modification = &self->modifications[cursor->prevModificationIndex];
+        chunk.text = &modification->insertEnd[-modification->insertLength];
+        chunk.length = modification->insertLength;
+        chunk.cursorOffset = modification->insertLength + cursor->offset;
+    } else {
+        int64_t textOffset;
+        if (cursor->prevModificationIndex < 0) {
+            textOffset = 0;
+        } else {
+            textOffset = self->modifications[cursor->prevModificationIndex].intervalEnd;
+        }
+        chunk.text = &self->text[textOffset];
+        int32_t nextIndex = cursor->prevModificationIndex + 1;
+        if (nextIndex < self->numModifications) {
+            chunk.length = self->modifications[nextIndex].intervalStart - textOffset;
+        } else {
+            chunk.length = self->textLength - textOffset;
+        }
+        chunk.cursorOffset = cursor->offset - textOffset;
+    }
+    return chunk;
+}
+
 void buffer_moveCursor(const struct buffer *self, struct buffer_cursor *cursor, int64_t offset) {
     cursor->bufferOffset += offset;
     assert(cursor->bufferOffset >= 0 && cursor->bufferOffset <= self->bufferLength);
@@ -521,44 +546,5 @@ int buffer_deleteAtCursor(struct buffer *self, const struct buffer_cursor *curso
     }
 
     self->bufferLength -= length;
-    return 0;
-}
-
-int buffer_writeToFile(const struct buffer *self, const char *path) {
-    struct fileWriter fileWriter;
-    if (fileWriter_init(&fileWriter, path) < 0) {
-        return -1;
-    }
-
-    int64_t prevOffset = 0;
-    for (int32_t i = 0; i < self->numModifications; ++i) {
-        struct buffer_modification *modification = &self->modifications[i];
-        // Write text before modification.
-        int64_t writeLength = modification->intervalStart - prevOffset;
-        if (writeLength > 0) {
-            if (fileWriter_append(&fileWriter, &self->text[prevOffset], writeLength) < 0) {
-                return -1;
-            }
-        }
-        // Write modification insertion.
-        if (modification->insertLength > 0) {
-            if (
-                fileWriter_append(
-                    &fileWriter,
-                    buffer_modification_getInsertStart(modification),
-                    modification->insertLength
-                ) < 0
-            ) {
-                return -1;
-            }
-        }
-        prevOffset = modification->intervalEnd;
-    }
-    int64_t writeLength = self->textLength - prevOffset;
-    if (writeLength > 0) {
-        if (fileWriter_append(&fileWriter, &self->text[prevOffset], writeLength) < 0) {
-            return -1;
-        }
-    }
     return 0;
 }

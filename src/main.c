@@ -1,5 +1,6 @@
 #include "buffer.h"
 #include "file/fileMapping.h"
+#include "file/fileWriter.h"
 
 #include <inttypes.h>
 #include <stdlib.h>
@@ -9,14 +10,14 @@ void printBuffer(struct buffer *buffer, struct buffer_cursor *cursor) {
     struct buffer_cursor cursorCopy;
     buffer_cursor_initCopy(&cursorCopy, cursor);
 
-    int64_t i = buffer->bufferLength - cursorCopy.bufferOffset;
-    if (i) {
-        printf("%c", buffer_getAtCursor(buffer, &cursorCopy));
-        while (--i) {
-            //buffer_moveCursor(buffer, cursor, 1);
-            
-            printf("%c", buffer_cursorNext(buffer, &cursorCopy));
-        }
+    while (buffer_cursor_getOffset(&cursorCopy) != buffer_getLength(buffer)) {
+        struct bufferChunk chunk = buffer_getCursorChunk(buffer, &cursorCopy);
+        assert(bufferChunk_getCursorOffset(&chunk) == 0);
+        assert(bufferChunk_getLength(&chunk) > 0);
+
+        printf("%.*s", (int)bufferChunk_getLength(&chunk), bufferChunk_getText(&chunk));
+
+        buffer_moveCursor(buffer, &cursorCopy, bufferChunk_getLength(&chunk));
     }
     printf("\n");
 }
@@ -52,6 +53,33 @@ void printBufferData(struct buffer *buffer) {
             break;
         }
     }
+}
+
+int writeBufferToFile(const struct buffer *buffer, const char *path) {
+    struct fileWriter fileWriter;
+    if (fileWriter_init(&fileWriter, path) < 0) {
+        return -1;
+    }
+
+    struct buffer_cursor readCursor;
+    buffer_cursor_init(&readCursor, buffer);
+
+    while (buffer_cursor_getOffset(&readCursor) != buffer_getLength(buffer)) {
+        struct bufferChunk chunk = buffer_getCursorChunk(buffer, &readCursor);
+        assert(bufferChunk_getCursorOffset(&chunk) == 0);
+        assert(bufferChunk_getLength(&chunk) > 0);
+        if (fileWriter_append(&fileWriter, bufferChunk_getText(&chunk), bufferChunk_getLength(&chunk)) < 0) {
+            return -1;
+        }
+        buffer_moveCursor(buffer, &readCursor, bufferChunk_getLength(&chunk));
+    }
+
+    if (fileWriter_close(&fileWriter) < 0) {
+        return -1;
+    }
+
+    fileWriter_deinit(&fileWriter);
+    return 0;
 }
 
 void test2(void) {
@@ -184,7 +212,7 @@ void test2(void) {
     buffer_unregisterCursor(&buffer, &cursor);
     buffer_unregisterCursor(&buffer, &printCursor);
 
-    buffer_writeToFile(&buffer, "out.txt");
+    writeBufferToFile(&buffer, ".out.txt");
 
     buffer_deinit(&buffer);
     fileMapping_deinit(&fileMapping);

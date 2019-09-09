@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 
 static bool assertBufferContents(const struct buffer *buffer, const char *content, const char *testName, int32_t testLine) {
     struct buffer_cursor cursor;
@@ -11,14 +12,9 @@ static bool assertBufferContents(const struct buffer *buffer, const char *conten
     int64_t contentLength = strlen(content);
     int64_t bufferLength = buffer_getLength(buffer);
     if (bufferLength == contentLength) {
-        if (bufferLength != 0) {
-            int64_t i = 0;
-            char c = buffer_getAtCursor(buffer, &cursor);
-            while (1) {
-                if (c != content[i]) goto fail;
-                if (++i == bufferLength) break;
-                c = buffer_cursorNext(buffer, &cursor);
-            }
+        for (int64_t i = 0; i < bufferLength; ++i) {
+            if (buffer_getAtCursor(buffer, &cursor) != content[i]) goto fail;
+            buffer_moveCursor(buffer, &cursor, 1);
         }
         return true;
     }
@@ -30,15 +26,10 @@ static bool assertBufferContents(const struct buffer *buffer, const char *conten
         content
     );
     // Print buffer contents.
-    if (bufferLength != 0) {
-        buffer_cursor_init(&cursor, buffer);
-        int64_t i = 0;
-        char c = buffer_getAtCursor(buffer, &cursor);
-        while (1) {
-            printf("%c", c);
-            if (++i == bufferLength) break;
-            c = buffer_cursorNext(buffer, &cursor);
-        }
+    while (buffer_cursor_getOffset(&cursor) != bufferLength) {
+        struct bufferChunk chunk = buffer_getCursorChunk(buffer, &cursor);
+        printf("%.*s", (int)bufferChunk_getLength(&chunk), bufferChunk_getText(&chunk));
+        buffer_moveCursor(buffer, &cursor, bufferChunk_getLength(&chunk));
     }
     printf("'\n");
     return false;
