@@ -8,7 +8,7 @@ int fileWriter_init(struct fileWriter *self, const char *path) {
     return 0;
 }
 
-int fileWriter_append(const struct fileWriter *self, char *data, int64_t length) {
+int fileWriter_append(const struct fileWriter *self, const char *data, int64_t length) {
     int64_t writtenLength = (int64_t)fwrite(data, 1, length, self->handle);
     if (writtenLength != length) {
         return fileWriter_append_FILE_WRITE_ERROR;
