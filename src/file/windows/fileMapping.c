@@ -3,11 +3,6 @@
 #include <stdio.h>
 
 int fileMapping_init(struct fileMapping *self, const char *path) {
-    char temp[1000];
-
-    GetCurrentDirectoryA(1000, &temp[0]);
-    printf("%s\n", temp);
-
     self->hFile = CreateFileA(
         path,
         GENERIC_READ,
@@ -17,10 +12,7 @@ int fileMapping_init(struct fileMapping *self, const char *path) {
         FILE_ATTRIBUTE_NORMAL,
         NULL
     );
-    if (self->hFile == INVALID_HANDLE_VALUE) {
-        printf("File create error: %lu\n", GetLastError());
-        goto cleanup_0;
-    }
+    if (self->hFile == INVALID_HANDLE_VALUE) goto cleanup_0;
 
     self->hFileMapping = CreateFileMappingA(
         self->hFile,
@@ -30,10 +22,7 @@ int fileMapping_init(struct fileMapping *self, const char *path) {
         0,
         NULL
     );
-    if (self->hFileMapping == NULL) {
-        printf("File mapping error: %lu\n", GetLastError());
-        goto cleanup_1;
-    }
+    if (self->hFileMapping == NULL) goto cleanup_1;
 
     self->content = MapViewOfFile(
         self->hFileMapping,
@@ -43,23 +32,12 @@ int fileMapping_init(struct fileMapping *self, const char *path) {
         0
     );
 
-    if (self->content == NULL) {
-        printf("File view error: %lu\n", GetLastError());
-        goto cleanup_2;
-    }
+    if (self->content == NULL) goto cleanup_2;
 
     LARGE_INTEGER fileSize;
-    if (!GetFileSizeEx(self->hFile, &fileSize)) {
-        printf("File size error: %lu\n", GetLastError());
-        goto cleanup_3;
-    }
+    if (!GetFileSizeEx(self->hFile, &fileSize)) goto cleanup_3;
 
     self->contentSize = fileSize.QuadPart;
-
-    for (int i = 0; i < self->contentSize; ++i) {
-        printf("%c", self->content[i]);
-    }
-    printf("\n");
     return 0;
 
     cleanup_3:
