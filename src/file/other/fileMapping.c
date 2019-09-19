@@ -6,20 +6,15 @@
 
 int fileMapping_init(struct fileMapping *self, const char *path) {
     FILE *handle = fopen(path, "rb");
-    if (handle == NULL) {
-        return fileMapping_init_FILE_READING_ERROR;
-    }
+    if (handle == NULL) return fileMapping_init_FILE_READING_ERROR;
 
     fseek(handle, 0, SEEK_END);
     self->contentSize = ftell(handle);
     rewind(handle);
 
     self->content = malloc(self->contentSize);
-    if (self->content == NULL) {
-        return fileMapping_init_MEMORY_ALLOCATION_ERROR;
-    }
+    if (self->content == NULL) return fileMapping_init_MEMORY_ALLOCATION_ERROR;
 
-    _Static_assert(sizeof(size_t) <= 8, "Code assumes size_t is max 8 bytes.");
     int64_t readSize = (int64_t)fread(self->content, 1, self->contentSize, handle);
 
     if (self->contentSize != readSize) {
@@ -28,11 +23,6 @@ int fileMapping_init(struct fileMapping *self, const char *path) {
         return fileMapping_init_FILE_READING_ERROR;
     }
     fclose(handle);
-
-    for (int i = 0; i < self->contentSize; ++i) {
-        printf("%c", self->content[i]);
-    }
-    printf("\n");
     return 0;
 }
 
