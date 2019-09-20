@@ -8,7 +8,7 @@
 
 void printBuffer(struct buffer *buffer, struct buffer_cursor *cursor) {
     struct buffer_cursor cursorCopy;
-    buffer_cursor_initCopy(&cursorCopy, cursor);
+    buffer_cursor_init_copy(&cursorCopy, cursor);
 
     while (buffer_cursor_getOffset(&cursorCopy) != buffer_getLength(buffer)) {
         struct bufferChunk chunk = buffer_getCursorChunk(buffer, &cursorCopy);
@@ -20,6 +20,7 @@ void printBuffer(struct buffer *buffer, struct buffer_cursor *cursor) {
         buffer_moveCursor(buffer, &cursorCopy, bufferChunk_getLength(&chunk));
     }
     printf("\n");
+    buffer_cursor_deinit(&cursorCopy);
 }
 
 void printBufferData(struct buffer *buffer) {
@@ -73,6 +74,7 @@ int writeBufferToFile(const struct buffer *buffer, const char *path) {
         }
         buffer_moveCursor(buffer, &readCursor, bufferChunk_getLength(&chunk));
     }
+    buffer_cursor_deinit(&readCursor);
 
     if (fileWriter_close(&fileWriter) < 0) {
         return -1;
@@ -211,6 +213,9 @@ void test2(void) {
 
     buffer_unregisterCursor(&buffer, &cursor);
     buffer_unregisterCursor(&buffer, &printCursor);
+
+    buffer_cursor_deinit(&cursor);
+    buffer_cursor_deinit(&printCursor);
 
     writeBufferToFile(&buffer, ".out.txt");
 

@@ -57,7 +57,7 @@ static inline char buffer_getAtCursor(const struct buffer *self, struct buffer_c
     }
 }
 
-static inline void buffer_cursor_initCopy(struct buffer_cursor *self, const struct buffer_cursor *copyFrom) {
+static inline void buffer_cursor_init_copy(struct buffer_cursor *self, const struct buffer_cursor *copyFrom) {
     *self = *copyFrom;
 }
 
@@ -67,6 +67,8 @@ static inline void buffer_cursor_init(struct buffer_cursor *self, const struct b
     self->prevModificationIndex = -1;
     buffer_moveCursor(buffer, self, 0); // Fix offset incase there's a modification at the start.
 }
+
+static inline void buffer_cursor_deinit(struct buffer_cursor *self) {}
 
 static inline int64_t buffer_cursor_getOffset(const struct buffer_cursor *self) {
     return self->bufferOffset;
