@@ -61,12 +61,7 @@ static inline void buffer_cursor_init_copy(struct buffer_cursor *self, const str
     *self = *copyFrom;
 }
 
-static inline void buffer_cursor_init(struct buffer_cursor *self, const struct buffer *buffer) {
-    self->bufferOffset = 0;
-    self->offset = 0;
-    self->prevModificationIndex = -1;
-    buffer_moveCursor(buffer, self, 0); // Fix offset incase there's a modification at the start.
-}
+void buffer_cursor_init(struct buffer_cursor *self, const struct buffer *buffer);
 
 static inline void buffer_cursor_deinit(struct buffer_cursor *self) {}
 

@@ -86,7 +86,7 @@ struct test_result buffer_test_simple(void) {
 struct test_result buffer_test_simpleMultiCursor(void) {
     const char *testName = "buffer_test_simpleMultiCursor";
 
-    #define simpleMultiCursor_NUM_CURSORS 5
+#define simpleMultiCursor_NUM_CURSORS 5
 
     struct buffer buffer;
     const char *tempText = (

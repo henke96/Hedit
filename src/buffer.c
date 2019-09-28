@@ -548,3 +548,10 @@ int buffer_deleteAtCursor(struct buffer *self, const struct buffer_cursor *curso
     self->bufferLength -= length;
     return 0;
 }
+
+void buffer_cursor_init(struct buffer_cursor *self, const struct buffer *buffer) {
+    self->bufferOffset = 0;
+    self->offset = 0;
+    self->prevModificationIndex = -1;
+    buffer_moveCursor(buffer, self, 0); // Fix offset incase there's a modification at the start.
+}
