@@ -28,10 +28,12 @@ set(test_sources
     "test/src/buffer_test.c"
 )
 
-# C flags.
+# Compiler specific.
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    add_compile_definitions(HEDIT_UNREACHABLE=__builtin_unreachable\(\))
     message("TODO")
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    add_compile_definitions(HEDIT_UNREACHABLE=__builtin_unreachable\(\))
     set(CMAKE_C_FLAGS 
         "-std=c11 -Wall -Wextra -Wpedantic -Wwrite-strings -no-pie -fno-pie"
     )
@@ -47,6 +49,7 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
     message("TODO")
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+    add_compile_definitions(HEDIT_UNREACHABLE=__assume\(0\))
     message("TODO")
 endif()
 
