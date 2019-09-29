@@ -3,14 +3,14 @@
 #endif
 
 #include "test.h"
-#include "buffer_test.h"
+#include "test_buffer.h"
 
 #include <stdio.h>
 #include <inttypes.h>
 
 static test_function_t *tests[] = {
-    buffer_test_simple,
-    buffer_test_simpleMultiCursor
+    test_buffer_simple,
+    test_buffer_simpleMultiCursor
 };
 
 #define NUM_TESTS (int32_t)(sizeof(tests)/sizeof(tests[0]))

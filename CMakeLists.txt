@@ -25,7 +25,7 @@ endif()
 # Test sources.
 set(test_sources
     "test/src/test.c"
-    "test/src/buffer_test.c"
+    "test/src/test_buffer.c"
 )
 
 # Compiler specific.

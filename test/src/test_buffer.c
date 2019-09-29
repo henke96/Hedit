@@ -1,4 +1,4 @@
-#include "buffer_test.h"
+#include "test_buffer.h"
 #include "buffer.h"
 
 #include <stdio.h>
@@ -47,8 +47,8 @@ static bool assertCursorOffset(const struct buffer_cursor *cursor, int64_t offse
     return false;
 }
 
-struct test_result buffer_test_simple(void) {
-    const char *testName = "buffer_test_simple";
+struct test_result test_buffer_simple(void) {
+    const char *testName = "buffer_simple";
 
     struct buffer buffer;
     struct buffer_cursor cursor;
@@ -83,8 +83,8 @@ struct test_result buffer_test_simple(void) {
     return test_result_create(true, testName);
 }
 
-struct test_result buffer_test_simpleMultiCursor(void) {
-    const char *testName = "buffer_test_simpleMultiCursor";
+struct test_result test_buffer_simpleMultiCursor(void) {
+    const char *testName = "buffer_simpleMultiCursor";
 
     #define simpleMultiCursor_NUM_CURSORS 5
 
