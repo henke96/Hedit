@@ -19,7 +19,6 @@ test_sources = \
 test/src/test.c\
 test/src/test_buffer.c
 
-
 gnu_flags = -Iinclude -DHEDIT_UNREACHABLE=__builtin_unreachable\(\) -std=c99 -Wall -Wextra -Wpedantic -Wwrite-strings -fno-pie
 gnu_debug_flags = -g
 gnu_release_flags = -O3 -s -DNDEBUG
