@@ -34,7 +34,7 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     message("TODO")
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     add_compile_definitions(HEDIT_UNREACHABLE=__builtin_unreachable\(\))
-    set(CMAKE_C_FLAGS 
+    set(CMAKE_C_FLAGS
         "-std=c11 -Wall -Wextra -Wpedantic -Wwrite-strings -no-pie -fno-pie"
     )
     set(CMAKE_C_FLAGS_RELEASE
