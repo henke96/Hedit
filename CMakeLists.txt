@@ -46,11 +46,8 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     set(CMAKE_C_FLAGS_DEBUG
         "-Wno-unused-parameter -g"
     )
-elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
-    message("TODO")
-elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-    add_compile_definitions(HEDIT_UNREACHABLE=__assume\(0\))
-    message("TODO")
+else()
+    message(FATAL_ERROR "Unsupported compiler!")
 endif()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "bin")

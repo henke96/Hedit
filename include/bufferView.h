@@ -59,7 +59,7 @@ static inline int bufferView_insertAtCursor(struct bufferView *self, int32_t cur
 }
 static inline int bufferView_deleteAtCursor(struct bufferView *self, int32_t cursor, int64_t length) {
     switch (self->type) {
-        case bufferView_type_TEXT: return textBufferView_deleteAtCursor(self, cursor, length); break;
+        case bufferView_type_TEXT: return textBufferView_deleteAtCursor(self, cursor, length); 
         case bufferView_type_HEX: return -1;
         default: HEDIT_UNREACHABLE;
     }
