@@ -52,14 +52,23 @@ static inline void bufferView_moveCursor(struct bufferView *self, int32_t cursor
 
 static inline int bufferView_insertAtCursor(struct bufferView *self, int32_t cursor, const char *str, int64_t strLength) {
     switch (self->type) {
-        case bufferView_type_TEXT: return textBufferView_insertAtCursor(self, cursor, str, strLength); break;
+        case bufferView_type_TEXT: return textBufferView_insertAtCursor(self, cursor, str, strLength);
         case bufferView_type_HEX: return -1;
         default: HEDIT_UNREACHABLE;
     }
 }
+
 static inline int bufferView_deleteAtCursor(struct bufferView *self, int32_t cursor, int64_t length) {
     switch (self->type) {
-        case bufferView_type_TEXT: return textBufferView_deleteAtCursor(self, cursor, length); break;
+        case bufferView_type_TEXT: return textBufferView_deleteAtCursor(self, cursor, length);
+        case bufferView_type_HEX: return -1;
+        default: HEDIT_UNREACHABLE;
+    }
+}
+
+static inline int64_t bufferView_getCursorLine(const struct bufferView *self, int32_t cursor) {
+    switch (self->type) {
+        case bufferView_type_TEXT: return textBufferView_getCursorLine(self, cursor);
         case bufferView_type_HEX: return -1;
         default: HEDIT_UNREACHABLE;
     }
