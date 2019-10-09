@@ -223,7 +223,7 @@ void test2(void) {
     fileMapping_deinit(&fileMapping);
 }
 
-int main(int argc, char **argv) {
+int main(void) {
     test2();
     return 0;
 }
