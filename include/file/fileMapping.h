@@ -5,7 +5,7 @@
 #define fileMapping_init_FILE_READING_ERROR -1
 #define fileMapping_init_MEMORY_ALLOCATION_ERROR -2
 
-#if defined(_WIN32)
+#if defined(HEDIT_WINDOWS)
     #define WIN32_LEAN_AND_MEAN
     #include <windows.h>
 #endif
@@ -14,10 +14,10 @@ struct fileMapping {
     int64_t contentSize;
     char *content;
 
-#if defined(_WIN32)
+#if defined(HEDIT_WINDOWS)
     HANDLE hFile;
     HANDLE hFileMapping;
-#elif defined(__linux__)
+#elif defined(HEDIT_LINUX)
     int fd;
 #endif
 };
