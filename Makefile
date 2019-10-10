@@ -1,5 +1,5 @@
 # NMake makefile
-!include buildConfiguration.mk
+!include BuildConfiguration.mk
 windows_main_sources = $(sources) $(windows_sources) $(main_sources)
 windows_test_sources = $(sources) $(windows_sources) $(test_sources)
 
@@ -10,6 +10,8 @@ release-clang: bin\release-clang.exe
 
 test: bin\test-msvc.exe
 test-clang: bin\test-clang.exe
+
+all: debug release debug-clang release-clang test test-clang
 
 clean:
 	del bin\* /Q

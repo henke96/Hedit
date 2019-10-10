@@ -1,5 +1,5 @@
 # GNU makefile
-include buildConfiguration.mk
+include BuildConfiguration.mk
 windows_main_sources = $(sources) $(windows_sources) $(main_sources)
 windows_test_sources = $(sources) $(windows_sources) $(test_sources)
 linux_main_sources = $(sources) $(linux_sources) $(main_sources)
@@ -18,6 +18,9 @@ test: bin/test-gcc
 test-clang: bin/test-clang
 win-test: bin/test-mingw.exe
 win-test-clang: bin/test-clang.exe
+
+all: debug release debug-clang release-clang win-debug win-release test test-clang win-test
+win-all: win-debug win-release win-debug-clang win-release-clang win-test win-test-clang
 
 clean:
 	rm -rf bin/*

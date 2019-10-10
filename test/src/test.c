@@ -19,7 +19,7 @@ void printTestFail(const char *name, const char *file, int32_t line) {
     printf("Test '%s' FAILED! (%s:%" PRId32 ")\n", name, file, line);
 }
 
-int main(int argc, char **argv) {
+int main(void) {
     int32_t numFailed = 0;
 
     const char *numTestString = "tests";
