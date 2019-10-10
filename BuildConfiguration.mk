@@ -27,7 +27,7 @@ gcc_flags = -no-pie
 clang_flags =
 mingw_flags = -Wno-pedantic-ms-format
 
-msvc_flags = /Iinclude /DHEDIT_UNREACHABLE=__assume\(0\) /Wall
-msvc_debug_flags = 
+msvc_flags = /Iinclude /DHEDIT_UNREACHABLE=__assume\(0\) /W4
+msvc_debug_flags = /DEBUG /Zi
 msvc_release_flags = /O2
 msvc_test_flags = /Itest/include
