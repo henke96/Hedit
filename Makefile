@@ -14,7 +14,7 @@ clean:
 bin\debug-msvc.exe: $(build_objs)
     link /OUT:$@ $(build_objs)
 
-!IF [nmake_gen_targets.bat "$(files)" "$(msvc_flags)" > .NMakeHelper.mk]
+!IF [NMakeHelperGenerator.bat "$(files)" "$(msvc_flags)" > .NMakeHelper.mk]
 !ENDIF
 
 !INCLUDE .NMakeHelper.mk
