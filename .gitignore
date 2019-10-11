@@ -1,3 +1,9 @@
-build
-bin
+bin/*
+!bin/objects
+
+*.dep
+*.o
+*.pdb
+
 .*
+!.gitkeep

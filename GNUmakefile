@@ -1,5 +1,5 @@
 # GNU makefile
-include BuildConfiguration.mk
+include Configuration.mk
 windows_main_sources = $(sources) $(windows_sources) $(main_sources)
 windows_test_sources = $(sources) $(windows_sources) $(test_sources)
 linux_main_sources = $(sources) $(linux_sources) $(main_sources)

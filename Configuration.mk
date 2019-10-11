@@ -19,6 +19,6 @@ gcc_release_flags = -s
 mingw_flags = -Wno-pedantic-ms-format
 
 msvc_flags = /Iinclude /DHEDIT_UNREACHABLE=__assume\(0\) /DHEDIT_WINDOWS /W4 /wd4204 /wd4127 /nologo
-msvc_debug_flags = /DEBUG /Zi
+msvc_debug_flags = /Zi
 msvc_release_flags = /O2
 msvc_test_flags = /Itest/include
