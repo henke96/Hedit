@@ -1,35 +1,20 @@
 # NMake makefile
 !include BuildConfiguration.mk
-windows_main_sources = $(sources) $(windows_sources) $(main_sources)
-windows_test_sources = $(sources) $(windows_sources) $(test_sources)
+temp = $(sources:src/=build/)
+temp2 = $(sources:src/=)
+build_objs = $(temp:.c=.o)
+files = $(temp2:.c=)
 
-debug: bin\debug-msvc.exe
-release: bin\release-msvc.exe
-debug-clang: bin\debug-clang.exe
-release-clang: bin\release-clang.exe
-
-test: bin\test-msvc.exe
-test-clang: bin\test-clang.exe
-
-all: debug release debug-clang release-clang test test-clang
+debug:
+	echo $(build_deps)
 
 clean:
-	del bin\* /Q
+    del bin\* /Q
 
-bin\debug-msvc.exe: $(headers) $(windows_main_sources)
-	cl /Fe$@ /Fobin\ /Fdbin\ /DHEDIT_WINDOWS $(msvc_flags) $(msvc_debug_flags) $(windows_main_sources)
+bin\debug-msvc.exe: $(build_objs)
+    link /OUT:$@ $(build_objs)
 
-bin\release-msvc.exe: $(headers) $(windows_main_sources)
-	cl /Fe$@ /Fobin\ /Fdbin\ /DHEDIT_WINDOWS $(msvc_flags) $(msvc_release_flags) $(windows_main_sources)
+!IF [nmake_gen_targets.bat "$(files)" "$(msvc_flags)" > .NMakeHelper.mk]
+!ENDIF
 
-bin\debug-clang.exe: $(headers) $(windows_main_sources)
-	clang -o $@ -DHEDIT_WINDOWS $(gnu_flags) $(gnu_debug_flags) $(windows_main_sources)
-
-bin\release-clang.exe: $(headers) $(windows_main_sources)
-	clang -o $@ -DHEDIT_WINDOWS $(gnu_flags) $(gnu_release_flags) $(windows_main_sources)
-
-bin\test-msvc.exe: $(headers) $(test_headers) $(windows_test_sources)
-	cl /Fe$@ /Fobin\ /Fdbin\ /DHEDIT_WINDOWS $(msvc_flags) $(msvc_test_flags) $(windows_test_sources)
-
-bin\test-clang.exe: $(headers) $(test_headers) $(windows_test_sources)
-	clang -o $@ -DHEDIT_WINDOWS $(gnu_flags) $(gnu_test_flags) $(windows_test_sources)
+!INCLUDE .NMakeHelper.mk
