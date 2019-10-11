@@ -9,6 +9,8 @@ enum bufferView_type {
 };
 
 struct bufferView {
+    struct buffer *buffer;
+    int64_t length;
     enum bufferView_type type;
 };
 
@@ -16,6 +18,10 @@ struct bufferView {
 
 static inline enum bufferView_type bufferView_getType(const struct bufferView *self) {
     return self->type;
+}
+
+static inline enum bufferView_type bufferView_getLength(const struct bufferView *self) {
+    return self->length;
 }
 
 static inline int bufferView_createCursor(struct bufferView *self, int32_t *out_cursor) {
@@ -66,9 +72,25 @@ static inline int bufferView_deleteAtCursor(struct bufferView *self, int32_t cur
     }
 }
 
+static inline struct bufferChunk bufferView_getCursorChunk(const struct bufferView *self, int32_t cursor) {
+    switch (self->type) {
+        case bufferView_type_TEXT: return textBufferView_getCursorChunk(self, cursor);
+        case bufferView_type_HEX: return (struct bufferChunk) {0};
+        default: HEDIT_UNREACHABLE;
+    }
+}
+
 static inline int64_t bufferView_getCursorLine(const struct bufferView *self, int32_t cursor) {
     switch (self->type) {
         case bufferView_type_TEXT: return textBufferView_getCursorLine(self, cursor);
+        case bufferView_type_HEX: return -1;
+        default: HEDIT_UNREACHABLE;
+    }
+}
+
+static inline int64_t bufferView_getCursorColumn(const struct bufferView *self, int32_t cursor) {
+    switch (self->type) {
+        case bufferView_type_TEXT: return textBufferView_getCursorColumn(self, cursor);
         case bufferView_type_HEX: return -1;
         default: HEDIT_UNREACHABLE;
     }

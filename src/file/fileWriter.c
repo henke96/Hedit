@@ -1,7 +1,7 @@
 #include "file/fileWriter.h"
 
-int fileWriter_init(struct fileWriter *self, const char *path) {
-    self->handle = fopen(path, "wb");
+int fileWriter_open(struct fileWriter *self) {
+    self->handle = fopen(self->path, "wb");
     if (self->handle == NULL) {
         return fileWriter_init_FILE_OPEN_ERROR;
     }

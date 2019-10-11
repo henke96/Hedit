@@ -1,4 +1,5 @@
 #pragma once
+#define _CRT_SECURE_NO_WARNINGS
 #include <inttypes.h>
 #include <stdio.h>
 
@@ -7,10 +8,13 @@
 #define fileWriter_close_FILE_CLOSE_ERROR -1
 
 struct fileWriter {
+    const char *path;
     FILE *handle;
 };
 
-int fileWriter_init(struct fileWriter *self, const char *path);
+static inline void fileWriter_init(struct fileWriter *self, const char *path) {
+    self->path = path;
+}
+int fileWriter_open(struct fileWriter *self);
 int fileWriter_append(const struct fileWriter *self, const char *data, int64_t length);
 int fileWriter_close(const struct fileWriter *self);
-static inline void fileWriter_deinit(struct fileWriter *self) {}

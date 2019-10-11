@@ -29,7 +29,7 @@ bin/debug-gcc: $(headers) $(linux_main_sources)
 	gcc -o $@ -DHEDIT_LINUX $(gnu_flags) $(gnu_debug_flags) $(gcc_flags) $(linux_main_sources)
 
 bin/release-gcc: $(headers) $(linux_main_sources)
-	gcc -o $@ -DHEDIT_LINUX $(gnu_flags) $(gnu_release_flags) $(gcc_flags) $(linux_main_sources)
+	gcc -o $@ -DHEDIT_LINUX $(gnu_flags) $(gnu_release_flags) $(gcc_flags) $(gcc_release_flags) $(linux_main_sources)
 
 bin/debug-clang: $(headers) $(linux_main_sources)
 	clang -o $@ -DHEDIT_LINUX $(gnu_flags) $(gnu_debug_flags) $(linux_main_sources)
@@ -41,7 +41,7 @@ bin/debug-mingw.exe: $(headers) $(windows_main_sources)
 	x86_64-w64-mingw32-gcc -o $@ -DHEDIT_WINDOWS $(gnu_flags) $(gnu_debug_flags) $(gcc_flags) $(mingw_flags) $(windows_main_sources)
 
 bin/release-mingw.exe: $(headers) $(windows_main_sources)
-	x86_64-w64-mingw32-gcc -o $@ -DHEDIT_WINDOWS $(gnu_flags) $(gnu_release_flags) $(gcc_flags) $(mingw_flags) $(windows_main_sources)
+	x86_64-w64-mingw32-gcc -o $@ -DHEDIT_WINDOWS $(gnu_flags) $(gnu_release_flags) $(gcc_flags) $(gcc_release_flags) $(mingw_flags) $(windows_main_sources)
 
 bin/debug-clang.exe: $(headers) $(windows_main_sources)
 	clang -o $@ -DHEDIT_WINDOWS $(gnu_flags) $(gnu_debug_flags) $(windows_main_sources)
