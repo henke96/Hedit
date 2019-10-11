@@ -28,8 +28,8 @@ bin\debug-clang.exe: $(headers) $(windows_main_sources)
 bin\release-clang.exe: $(headers) $(windows_main_sources)
 	clang -o $@ -DHEDIT_WINDOWS $(gnu_flags) $(gnu_release_flags) $(windows_main_sources)
 
-bin\test-msvc.exe: $(headers) $(windows_test_sources)
+bin\test-msvc.exe: $(headers) $(test_headers) $(windows_test_sources)
 	cl /Fe$@ /Fobin\ /Fdbin\ /DHEDIT_WINDOWS $(msvc_flags) $(msvc_test_flags) $(windows_test_sources)
 
-bin\test-clang.exe: $(headers) $(windows_test_sources)
+bin\test-clang.exe: $(headers) $(test_headers) $(windows_test_sources)
 	clang -o $@ -DHEDIT_WINDOWS $(gnu_flags) $(gnu_test_flags) $(windows_test_sources)

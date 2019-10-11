@@ -2,6 +2,9 @@ headers =\
 include/*.h\
 include/file/*.h
 
+test_headers=\
+test/include/*.h
+
 sources =\
 src/buffer.c\
 src/file/fileWriter.c
