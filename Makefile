@@ -16,10 +16,7 @@ release-clang: bin\release-clang.exe
 all: debug release debug-clang release-clang
 
 clean:
-    del bin\* /Q
-    del bin\objects\*.o /S /Q > nul
-    del bin\objects\*.dep /S /Q > nul
-    del bin\objects\*.pdb /S /Q > nul
+    buildsystem\clean.bat
 
 bin\debug-msvc.exe: $(msvc_d_objs)
     link /OUT:$@ /PDB:bin\debug-msvc.pdb /DEBUG $** /NOLOGO
