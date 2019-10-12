@@ -13,6 +13,8 @@ release: bin\release-msvc.exe
 debug-clang: bin\debug-clang.exe
 release-clang: bin\release-clang.exe
 
+all: debug release debug-clang release-clang
+
 clean:
     del bin\* /Q
     del bin\objects\*.o /S /Q > nul
@@ -20,16 +22,16 @@ clean:
     del bin\objects\*.pdb /S /Q > nul
 
 bin\debug-msvc.exe: $(msvc_d_objs)
-    link /OUT:$@ /PDB:bin\debug-msvc.pdb /DEBUG $?
+    link /NOLOGO /OUT:$@ /PDB:bin\debug-msvc.pdb /DEBUG $**
 
 bin\release-msvc.exe: $(msvc_objs)
-    link /OUT:$@ $?
+    link /NOLOGO /OUT:$@ $**
 
 bin\debug-clang.exe: $(clang_d_objs)
-    link /OUT:$@ /PDB:bin\debug-clang.pdb /DEBUG $?
+    lld-link /DEFAULTLIB:libcmt /OUT:$@ /PDB:bin\debug-clang.pdb /DEBUG $**
 
 bin\release-clang.exe: $(clang_objs)
-    link /OUT:$@ $?
+    lld-link /DEFAULTLIB:libcmt /OUT:$@ $**
 
 !IF [buildsystem\NMakeHelper.bat "$(files)" \
 "$(msvc_flags) $(msvc_debug_flags)" \
