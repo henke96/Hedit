@@ -28,7 +28,7 @@ bin\release-msvc.exe: $(msvc_objs)
     link /OUT:$@ $** /NOLOGO
 
 bin\debug-clang.exe: $(clang_d_objs)
-    lld-link /OUT:$@ /PDB:bin\debug-clang.pdb /DEBUG $**  /DEFAULTLIB:libcmt
+    lld-link /OUT:$@ /PDB:bin\debug-clang.pdb /DEBUG $** /DEFAULTLIB:libcmt
 
 bin\release-clang.exe: $(clang_objs)
     lld-link /OUT:$@ $** /DEFAULTLIB:libcmt
