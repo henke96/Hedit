@@ -51,7 +51,7 @@ clean:
 win-clean:
 	buildsystem\clean.bat
 
-
+# Binaries
 bin/debug-gcc: $(gcc_d_objs)
 	gcc -o $@ $^ $(gcc_d_allflags)
 
@@ -65,18 +65,18 @@ bin/release-clang: $(clang_objs)
 	clang -o $@ $^ $(clang_allflags)
 
 bin/debug-mingw.exe: $(mingw_d_objs)
-	x86_64-w64-mingw32-gcc -o $@ $^ $(mingw_d_allflags)
+	x86_64-w64-mingw32-gcc -o $@ $(mingw_d_allflags) $^
 
 bin/release-mingw.exe: $(mingw_objs)
-	x86_64-w64-mingw32-gcc -o $@ $^ $(mingw_allflags)
+	x86_64-w64-mingw32-gcc -o $@ $(mingw_allflags) $^
 
 bin/debug-clang.exe: $(win_clang_d_objs)
-	clang -o $@ $^ $(win_clang_d_allflags)
+	clang -o $@ $(win_clang_d_allflags) $^
 
 bin/release-clang.exe: $(win_clang_objs)
-	clang -o $@ $^ $(win_clang_allflags)
+	clang -o $@ $(win_clang_allflags) $^
 
-
+# Objects
 bin/objects/%.gcc_d.o: bin/objects/%.gcc.dep
 	gcc -o $@ -c $(gcc_d_allflags) src/$*.c
 
@@ -101,7 +101,7 @@ bin/objects/%.win_clang_d.o: bin/objects/%.win_clang.dep
 bin/objects/%.win_clang.o: bin/objects/%.win_clang.dep
 	clang -o $@ -c $(win_clang_allflags) src/$*.c
 
-
+# Dependencies
 bin/objects/%.gcc.dep: src/%.c
 	gcc -c -MM -MP -MF $@ -MT "bin/objects/$*.gcc.o bin/objects/$*.gcc_d.o" $(gcc_allflags) src/$*.c
 
