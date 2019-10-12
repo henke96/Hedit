@@ -4,7 +4,7 @@ dep_flags = -MMD -MP -MF $<
 
 mingw_deps = $(sources:src/%.c=bin/objects/%_mingw.dep)
 mingw_objs = $(sources:src/%.c=bin/objects/%_mingw.o)
-mingw_allflags = $(gnu_flags) $(gnu_release_flags) $(gnu_windows_flags) $(gcc_flags) $(gcc_release_flags) $(mingw_flags)
+mingw_allflags = $(gnu_flags) $(gnu_release_flags) $(gnu_windows_flags) $(gcc_flags) $(mingw_flags)
 mingw_d_objs = $(sources:src/%.c=bin/objects/%_mingw_d.o)
 mingw_d_allflags = $(gnu_flags) $(gnu_debug_flags) $(gnu_windows_flags) $(gcc_flags) $(mingw_flags)
 
@@ -25,10 +25,10 @@ win-clean:
 	buildsystem\clean.bat
 
 bin/debug-mingw.exe: $(mingw_d_objs)
-	x86_64-w64-mingw32-gcc -o $@ $^ $(mingw_d_allflags)
+	x86_64-w64-mingw32-gcc -o $@ $^ -g
 
 bin/release-mingw.exe: $(mingw_objs)
-	x86_64-w64-mingw32-gcc -o $@ $^ $(mingw_allflags)
+	x86_64-w64-mingw32-gcc -o $@ $^
 
 bin/debug-clang.exe: $(clang_d_objs)
 	clang -o $@ $^ -g

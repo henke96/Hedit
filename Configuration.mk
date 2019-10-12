@@ -14,12 +14,9 @@ gnu_flags = -Iinclude -DHEDIT_UNREACHABLE=__builtin_unreachable\(\) -std=c99 -Wa
 gnu_debug_flags = -g
 gnu_release_flags = -O3 -DNDEBUG
 gnu_windows_flags = -DHEDIT_WINDOWS
-gnu_test_flags = -Itest/include
 gcc_flags = -no-pie
-gcc_release_flags = -s
 mingw_flags = -Wno-pedantic-ms-format
 
 msvc_flags = /Iinclude /DHEDIT_UNREACHABLE=__assume\(0\) /DHEDIT_WINDOWS /W4 /wd4204 /wd4127 /nologo
 msvc_debug_flags = /Z7
 msvc_release_flags = /O2
-msvc_test_flags = /Itest/include
