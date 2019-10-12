@@ -22,16 +22,16 @@ clean:
     del bin\objects\*.pdb /S /Q > nul
 
 bin\debug-msvc.exe: $(msvc_d_objs)
-    link /NOLOGO /OUT:$@ /PDB:bin\debug-msvc.pdb /DEBUG $**
+    link /OUT:$@ /PDB:bin\debug-msvc.pdb /DEBUG $** /NOLOGO
 
 bin\release-msvc.exe: $(msvc_objs)
-    link /NOLOGO /OUT:$@ $**
+    link /OUT:$@ $** /NOLOGO
 
 bin\debug-clang.exe: $(clang_d_objs)
-    lld-link /DEFAULTLIB:libcmt /OUT:$@ /PDB:bin\debug-clang.pdb /DEBUG $**
+    lld-link /OUT:$@ /PDB:bin\debug-clang.pdb /DEBUG $**  /DEFAULTLIB:libcmt
 
 bin\release-clang.exe: $(clang_objs)
-    lld-link /DEFAULTLIB:libcmt /OUT:$@ $**
+    lld-link /OUT:$@ $** /DEFAULTLIB:libcmt
 
 !IF [buildsystem\NMakeHelper.bat "$(files)" \
 "$(msvc_flags) $(msvc_debug_flags)" \

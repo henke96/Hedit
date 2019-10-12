@@ -7,14 +7,14 @@ for /F "tokens=1,2,3,*" %%A in ('"cl /nologo /c src\%~1.c /Zs /showIncludes %~3"
     if "%%A"=="Note:" if "%%B"=="including" if "%%C"=="file:" echo "%%D" \
 )
 echo. 
-for /F %%^" in ("""") do echo(%%~"    cl /c /Fo$@ %~2 src\%~1.c
+for /F %%^" in ("""") do echo(%%~"    cl /Fo$@ /c %~2 src\%~1.c
 
 echo bin\objects\%~1_msvc.o: src\%~1.c bin\objects\%~1_msvc.dep \
 for /F "tokens=1,2,3,*" %%A in ('"cl /nologo /c src\%~1.c /Zs /showIncludes %~3"') do (
     if "%%A"=="Note:" if "%%B"=="including" if "%%C"=="file:" echo "%%D" \
 )
 echo. 
-for /F %%^" in ("""") do echo(%%~"    cl /c /Fo$@ %~3 src\%~1.c
+for /F %%^" in ("""") do echo(%%~"    cl /Fo$@ /c %~3 src\%~1.c
 for /F "tokens=1,2,3,*" %%A in ('"cl /nologo /c src\%~1.c /Zs /showIncludes %~3"') do (
     if "%%A"=="Note:" if "%%B"=="including" if "%%C"=="file:" echo "%%D":
 )
