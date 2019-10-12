@@ -37,4 +37,4 @@ bin\release-clang.exe: $(clang_objs)
 "$(gnu_flags) $(gnu_release_flags) $(gnu_windows_flags)"]
 !ENDIF
 
-!INCLUDE bin\tmp\NMakeDeps.mk
+!INCLUDE buildsystem\tmp\NMakeDeps.mk
