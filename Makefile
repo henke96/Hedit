@@ -24,11 +24,11 @@ bin\debug-msvc.exe: $(msvc_d_objs)
 bin\release-msvc.exe: $(msvc_objs)
     link /OUT:$@ $** /NOLOGO
 
-bin\debug-clang.exe: $(clang_d_objs)
-    lld-link /OUT:$@ /PDB:bin\debug-clang.pdb /DEBUG $** /DEFAULTLIB:libcmt
+bin/debug-clang.exe: $(clang_d_objs)
+	clang -o $@ $** -g
 
-bin\release-clang.exe: $(clang_objs)
-    lld-link /OUT:$@ $** /DEFAULTLIB:libcmt
+bin/release-clang.exe: $(clang_objs)
+	clang -o $@ $**
 
 !IF [buildsystem\NMakeHelper.bat "$(files)" \
 "$(msvc_flags) $(msvc_debug_flags)" \
