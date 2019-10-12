@@ -21,7 +21,7 @@ bin\debug-msvc.exe: $(msvc_d_objs)
 bin\release-msvc.exe: $(msvc_objs)
     link /OUT:$@ $(msvc_objs)
 
-!IF [buildsystem\NMakeHelper.bat "$(files)" "$(msvc_flags) $(msvc_debug_flags)" "$(msvc_flags) $(msvc_release_flags)"]
+!IF [buildsystem\NMakeHelper.bat "$(files)" "$(msvc_flags) $(msvc_debug_flags)" "$(msvc_flags) $(msvc_release_flags)" "$(gnu_flags) $(gnu_debug_flags)" "$(gnu_flags) $(gnu_release_flags)"]
 !ENDIF
 
 !INCLUDE bin\tmp\NMakeDeps.mk
