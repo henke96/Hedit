@@ -5,7 +5,7 @@ where cl >nul 2>&1
 if %ERRORLEVEL%==0 (
     for %%X in (%~1) do (
         if not exist "build\%%X.msvc.dep" (
-            call buildsystem\MsvcGenDeps.bat "%%X" %2 %3 > "build\%%X.msvc.dep"
+            call buildsystem\MsvcGenDeps.bat "%%X" %2 %3 %6 > "build\%%X.msvc.dep"
             @echo off
         )
         echo !INCLUDE build\%%X.msvc.dep >> buildsystem\NMakeTemp.dep
@@ -15,7 +15,7 @@ where clang >nul 2>&1
 if %ERRORLEVEL%==0 (
     for %%X in (%~1) do (
         if not exist "build\%%X.nm_win_clang.dep" (
-            call buildsystem\ClangGenDeps.bat "%%X" %4 %5 > "build\%%X.nm_win_clang.dep"
+            call buildsystem\ClangGenDeps.bat "%%X" %4 %5 %6 %7 > "build\%%X.nm_win_clang.dep"
             @echo off
         )
         echo !INCLUDE build\%%X.nm_win_clang.dep >> buildsystem\NMakeTemp.dep
