@@ -8,8 +8,8 @@ struct test_result {
 
 static inline struct test_result test_result_create(bool success, const char *testName) {
     return (struct test_result) {
-        .success = success,
-        .testName = testName
+        .testName = testName,
+        .success = success
     };
 }
 
