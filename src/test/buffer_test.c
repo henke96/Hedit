@@ -1,4 +1,4 @@
-#include "test/test_buffer.h"
+#include "test/buffer_test.h"
 #include "main/buffer.h"
 
 #include <stdio.h>
@@ -19,7 +19,7 @@ static bool assertBufferContents(const struct buffer *buffer, const char *conten
         return true;
     }
     fail:
-    printTestFail(testName, __FILE__, testLine);
+    test_printTestFail(testName, __FILE__, testLine);
     printf(
         "\tBuffer contents not as expected!\n"
         "\tExpected: '%s'\n\tActual: '",
@@ -37,7 +37,7 @@ static bool assertBufferContents(const struct buffer *buffer, const char *conten
 
 static bool assertCursorOffset(const struct buffer_cursor *cursor, int64_t offset, const char *testName, int32_t testLine) {
     if (buffer_cursor_getOffset(cursor) == offset) return true;
-    printTestFail(testName, __FILE__, testLine);
+    test_printTestFail(testName, __FILE__, testLine);
     printf(
         "\tCursor offset not as expected!\n"
         "\tExpected: %" PRId64 "\n"
@@ -47,8 +47,8 @@ static bool assertCursorOffset(const struct buffer_cursor *cursor, int64_t offse
     return false;
 }
 
-struct test_result test_buffer_simple(void) {
-    const char *testName = "buffer_simple";
+struct test_result buffer_test_simple(void) {
+    const char *testName = "buffer_test_simple";
 
     struct buffer buffer;
     struct buffer_cursor cursor;
@@ -83,8 +83,8 @@ struct test_result test_buffer_simple(void) {
     return test_result_create(true, testName);
 }
 
-struct test_result test_buffer_simpleMultiCursor(void) {
-    const char *testName = "buffer_simpleMultiCursor";
+struct test_result buffer_test_simpleMultiCursor(void) {
+    const char *testName = "buffer_test_simpleMultiCursor";
 
     #define simpleMultiCursor_NUM_CURSORS 5
 

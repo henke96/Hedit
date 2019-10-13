@@ -1,17 +1,17 @@
 #include "test/test.h"
-#include "test/test_buffer.h"
+#include "test/buffer_test.h"
 
 #include <stdio.h>
 #include <inttypes.h>
 
 static test_function_t *tests[] = {
-    test_buffer_simple,
-    test_buffer_simpleMultiCursor
+    buffer_test_simple,
+    buffer_test_simpleMultiCursor
 };
 
 #define NUM_TESTS (int32_t)(sizeof(tests)/sizeof(tests[0]))
 
-void printTestFail(const char *name, const char *file, int32_t line) {
+void test_printTestFail(const char *name, const char *file, int32_t line) {
     printf("Test '%s' FAILED! (%s:%" PRId32 ")\n", name, file, line);
 }
 

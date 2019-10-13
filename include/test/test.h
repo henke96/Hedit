@@ -15,4 +15,4 @@ static inline struct test_result test_result_create(bool success, const char *te
 
 typedef struct test_result test_function_t(void);
 
-void printTestFail(const char *testName, const char *file, int line);
+void test_printTestFail(const char *testName, const char *file, int line);
