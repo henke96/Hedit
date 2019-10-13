@@ -57,10 +57,10 @@ bin\release-clang.exe: $(win_clang_common_objs) $(win_clang_main_objs)
 
 # Test binaries
 bin\test-debug-msvc.exe: $(msvc_d_common_objs) $(msvc_d_test_objs)
-    link /OUT:$@ /PDB:bin\debug-msvc.pdb /DEBUG /NOLOGO $(msvc_d_common_objs) $(msvc_d_test_objs)
+    link /OUT:$@ /PDB:bin\test-debug-msvc.pdb /DEBUG /NOLOGO $(msvc_d_common_objs) $(msvc_d_test_objs)
 
-bin\test-release-msvc.exe: $(msvc_common_objs) $(msvc_main_objs)
-    link /OUT:$@ /NOLOGO $(msvc_common_objs) $(msvc_main_objs)
+bin\test-release-msvc.exe: $(msvc_common_objs) $(msvc_test_objs)
+    link /OUT:$@ /NOLOGO $(msvc_common_objs) $(msvc_test_objs)
 
 bin\test-debug-clang.exe: $(win_clang_d_common_objs) $(win_clang_d_test_objs)
 	clang -o $@ $(win_clang_d_allflags) $(win_clang_d_common_objs) $(win_clang_d_test_objs)
@@ -79,4 +79,4 @@ all_files = $(temp_all:.c=)
 "$(win_clang_allflags)"]
 !ENDIF
 
-!INCLUDE buildsystem\tmp\NMakeDeps.mk
+!INCLUDE build\NMakeDeps.dep

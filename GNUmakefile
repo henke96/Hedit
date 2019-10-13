@@ -75,6 +75,7 @@ win-all: win-debug win-test-debug win-release win-test-release win-debug-clang w
 
 clean:
 	find bin/ -maxdepth 1 -type f -exec rm "{}" \;
+	find build/ -maxdepth 1 -type f -exec rm "{}" \;
 	find build/ -type f -name "*.o" -exec rm "{}" \;
 	find build/ -type f -name "*.dep" -exec rm "{}" \;
 
