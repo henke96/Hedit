@@ -15,7 +15,7 @@ src/main/main.c
 
 main_windows_sources =
 
-main_linux_sources = 
+main_linux_sources =
 
 # Test sources
 test_sources =\
