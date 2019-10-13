@@ -1,7 +1,5 @@
 # GNU makefile
 include Configuration.mk
-dep_flags = -MMD -MP -MF $<
-
 all_common_sources = $(common_sources) $(common_linux_sources)
 all_main_sources = $(main_sources) $(main_linux_sources)
 all_test_sources = $(test_sources) $(test_linux_sources)
