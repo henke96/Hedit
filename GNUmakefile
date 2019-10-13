@@ -78,6 +78,8 @@ clean:
 	find build/ -maxdepth 1 -type f -exec rm "{}" \;
 	find build/ -type f -name "*.o" -exec rm "{}" \;
 	find build/ -type f -name "*.dep" -exec rm "{}" \;
+	find build/ -type f -name "*.pdb" -exec rm "{}" \;
+	find build/ -type f -name "*.obj" -exec rm "{}" \;
 
 win-clean:
 	buildsystem\clean.bat
@@ -87,53 +89,53 @@ bin:
 
 # Main binaries
 bin/debug-gcc: $(gcc_d_common_objs) $(gcc_d_main_objs) | bin
-	gcc -o $@ $(gcc_d_allflags) $(gcc_d_common_objs) $(gcc_d_main_objs)
+	gcc -o $@ $(gcc_d_allflags) $^
 
 bin/release-gcc: $(gcc_common_objs) $(gcc_main_objs) | bin
-	gcc -o $@ $(gcc_allflags) $(gcc_common_objs) $(gcc_main_objs)
+	gcc -o $@ $(gcc_allflags) $^
 
 bin/debug-clang: $(clang_d_common_objs) $(clang_d_main_objs) | bin
-	clang -o $@ $(clang_d_allflags) $(clang_d_common_objs) $(clang_d_main_objs)
+	clang -o $@ $(clang_d_allflags) $^
 
 bin/release-clang: $(clang_common_objs) $(clang_main_objs) | bin
-	clang -o $@ $(clang_allflags) $(clang_common_objs) $(clang_main_objs)
+	clang -o $@ $(clang_allflags) $^
 
 bin/debug-mingw.exe: $(mingw_d_common_objs) $(mingw_d_main_objs) | bin
-	x86_64-w64-mingw32-gcc -o $@ $(mingw_d_allflags) $(mingw_d_common_objs) $(mingw_d_main_objs)
+	x86_64-w64-mingw32-gcc -o $@ $(mingw_d_allflags) $^
 
 bin/release-mingw.exe: $(mingw_common_objs) $(mingw_main_objs) | bin
-	x86_64-w64-mingw32-gcc -o $@ $(mingw_allflags) $(mingw_common_objs) $(mingw_main_objs)
+	x86_64-w64-mingw32-gcc -o $@ $(mingw_allflags) $^
 
 bin/debug-clang.exe: $(win_clang_d_common_objs) $(win_clang_d_main_objs) | bin
-	clang -o $@ $(win_clang_d_allflags) $(win_clang_d_common_objs) $(win_clang_d_main_objs)
+	clang -o $@ $(win_clang_d_allflags) $^
 
 bin/release-clang.exe: $(win_clang_common_objs) $(win_clang_main_objs) | bin
-	clang -o $@ $(win_clang_allflags) $(win_clang_common_objs) $(win_clang_main_objs)
+	clang -o $@ $(win_clang_allflags) $^
 
 # Test binaries
 bin/test-debug-gcc: $(gcc_d_common_objs) $(gcc_d_test_objs) | bin
-	gcc -o $@ $(gcc_d_allflags) $(gcc_d_common_objs) $(gcc_d_test_objs)
+	gcc -o $@ $(gcc_d_allflags) $^
 
 bin/test-release-gcc: $(gcc_common_objs) $(gcc_test_objs) | bin
-	gcc -o $@ $(gcc_allflags) $(gcc_common_objs) $(gcc_test_objs)
+	gcc -o $@ $(gcc_allflags) $^
 
 bin/test-debug-clang: $(clang_d_common_objs) $(clang_d_test_objs) | bin
-	clang -o $@ $(clang_d_allflags) $(clang_d_common_objs) $(clang_d_test_objs)
+	clang -o $@ $(clang_d_allflags) $^
 
 bin/test-release-clang: $(clang_common_objs) $(clang_test_objs) | bin
-	clang -o $@ $(clang_allflags) $(clang_common_objs) $(clang_test_objs)
+	clang -o $@ $(clang_allflags) $^
 
 bin/test-debug-mingw.exe: $(mingw_d_common_objs) $(mingw_d_test_objs) | bin
-	x86_64-w64-mingw32-gcc -o $@ $(mingw_d_allflags) $(mingw_d_common_objs) $(mingw_d_test_objs)
+	x86_64-w64-mingw32-gcc -o $@ $(mingw_d_allflags) $^
 
 bin/test-release-mingw.exe: $(mingw_common_objs) $(mingw_test_objs) | bin
-	x86_64-w64-mingw32-gcc -o $@ $(mingw_allflags) $(mingw_common_objs) $(mingw_test_objs)
+	x86_64-w64-mingw32-gcc -o $@ $(mingw_allflags) $^
 
 bin/test-debug-clang.exe: $(win_clang_d_common_objs) $(win_clang_d_test_objs) | bin
-	clang -o $@ $(win_clang_d_allflags) $(win_clang_d_common_objs) $(win_clang_d_test_objs)
+	clang -o $@ $(win_clang_d_allflags) $^
 
 bin/test-release-clang.exe: $(win_clang_common_objs) $(win_clang_test_objs) | bin
-	clang -o $@ $(win_clang_allflags) $(win_clang_common_objs) $(win_clang_test_objs)
+	clang -o $@ $(win_clang_allflags) $^
 
 # Objects
 build/%.gcc_d.o: build/%.gcc.dep

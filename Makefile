@@ -10,12 +10,12 @@ temp_common = $(win_all_common_sources:src/=build/)
 temp_main = $(win_all_main_sources:src/=build/)
 temp_test = $(win_all_test_sources:src/=build/)
 
-msvc_common_objs = $(temp_common:.c=.msvc.o)
-msvc_main_objs = $(temp_main:.c=.msvc.o)
-msvc_test_objs = $(temp_test:.c=.msvc.o)
-msvc_d_common_objs = $(temp_common:.c=.msvc_d.o)
-msvc_d_main_objs = $(temp_main:.c=.msvc_d.o)
-msvc_d_test_objs = $(temp_test:.c=.msvc_d.o)
+msvc_common_objs = $(temp_common:.c=.msvc.obj)
+msvc_main_objs = $(temp_main:.c=.msvc.obj)
+msvc_test_objs = $(temp_test:.c=.msvc.obj)
+msvc_d_common_objs = $(temp_common:.c=.msvc_d.obj)
+msvc_d_main_objs = $(temp_main:.c=.msvc_d.obj)
+msvc_d_test_objs = $(temp_test:.c=.msvc_d.obj)
 msvc_allflags = $(msvc_flags) $(msvc_release_flags)
 msvc_d_allflags = $(msvc_flags) $(msvc_debug_flags)
 
@@ -44,23 +44,23 @@ clean:
 
 # Main binaries
 bin\debug-msvc.exe: $(msvc_d_common_objs) $(msvc_d_main_objs)
-    link /OUT:$@ /PDB:bin\debug-msvc.pdb /DEBUG /NOLOGO $(msvc_d_common_objs) $(msvc_d_main_objs)
+    cl /Fe$@ $(msvc_d_allflags) $**
 
 bin\release-msvc.exe: $(msvc_common_objs) $(msvc_main_objs)
-    link /OUT:$@ /NOLOGO $(msvc_common_objs) $(msvc_main_objs)
+    cl /Fe$@ $(msvc_allflags) $**
 
 bin\debug-clang.exe: $(win_clang_d_common_objs) $(win_clang_d_main_objs)
-	clang -o $@ $(win_clang_d_allflags) $(win_clang_d_common_objs) $(win_clang_d_main_objs)
+	clang -o $@ $(win_clang_d_allflags) $**
 
 bin\release-clang.exe: $(win_clang_common_objs) $(win_clang_main_objs)
-	clang -o $@ $(win_clang_allflags) $(win_clang_common_objs) $(win_clang_main_objs)
+	clang -o $@ $(win_clang_allflags) $**
 
 # Test binaries
 bin\test-debug-msvc.exe: $(msvc_d_common_objs) $(msvc_d_test_objs)
-    link /OUT:$@ /PDB:bin\test-debug-msvc.pdb /DEBUG /NOLOGO $(msvc_d_common_objs) $(msvc_d_test_objs)
+    cl /Fe$@ $(msvc_d_allflags) $**
 
 bin\test-release-msvc.exe: $(msvc_common_objs) $(msvc_test_objs)
-    link /OUT:$@ /NOLOGO $(msvc_common_objs) $(msvc_test_objs)
+    cl /Fe$@ $(msvc_allflags) $**
 
 bin\test-debug-clang.exe: $(win_clang_d_common_objs) $(win_clang_d_test_objs)
 	clang -o $@ $(win_clang_d_allflags) $(win_clang_d_common_objs) $(win_clang_d_test_objs)
