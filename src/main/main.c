@@ -1,6 +1,6 @@
-#include "buffer.h"
-#include "file/fileMapping.h"
-#include "file/fileWriter.h"
+#include "main/buffer.h"
+#include "main/file/fileMapping.h"
+#include "main/file/fileWriter.h"
 
 #include <inttypes.h>
 #include <stdlib.h>

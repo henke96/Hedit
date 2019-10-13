@@ -1,5 +1,5 @@
-#include "textBufferView.h"
-#include "buffer.h"
+#include "main/textBufferView.h"
+#include "main/buffer.h"
 #include <stdlib.h>
 
 #define SELF ((struct textBufferView *)self)

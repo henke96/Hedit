@@ -1,14 +1,32 @@
+# Common sources
 common_sources =\
-src/main.c\
-src/buffer.c\
-src/file/fileWriter.c
+src/main/buffer.c\
+src/main/file/fileWriter.c
 
-windows_sources =\
-src/file/windows/fileMapping.c
+common_windows_sources =\
+src/main/file/windows/fileMapping.c
 
-linux_sources =\
-src/file/linux/fileMapping.c
+common_linux_sources =\
+src/main/file/linux/fileMapping.c
 
+# Main sources
+main_sources =\
+src/main/main.c
+
+main_windows_sources =
+
+main_linux_sources = 
+
+# Test sources
+test_sources =\
+src/test/test.c\
+src/test/test_buffer.c
+
+test_windows_sources =
+
+test_linux_sources =
+
+# Flags
 gnu_flags = -Iinclude -DHEDIT_UNREACHABLE=__builtin_unreachable\(\) -std=c99 -Wall -Wextra -Wpedantic -Wwrite-strings -fno-pie
 gnu_debug_flags = -g
 gnu_release_flags = -O3 -DNDEBUG -s

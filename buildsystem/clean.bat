@@ -1,5 +1,5 @@
 @echo off
-del bin\* /Q
-del bin\objects\*.o /S /Q > nul 2> nul
-del bin\objects\*.dep /S /Q > nul 2> nul
-del bin\objects\*.pdb /S /Q > nul 2> nul
+del /Q bin\*
+del /S /Q build\*.o > nul 2> nul
+del /S /Q build\*.dep > nul 2> nul
+del /S /Q  build\*.pdb> nul 2> nul

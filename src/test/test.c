@@ -1,9 +1,5 @@
-#if defined(NDEBUG)
-#error NDEBUG defined when building tests!
-#endif
-
-#include "test.h"
-#include "test_buffer.h"
+#include "test/test.h"
+#include "test/test_buffer.h"
 
 #include <stdio.h>
 #include <inttypes.h>

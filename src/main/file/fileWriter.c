@@ -1,4 +1,4 @@
-#include "file/fileWriter.h"
+#include "main/file/fileWriter.h"
 
 int fileWriter_open(struct fileWriter *self) {
     self->handle = fopen(self->path, "wb");

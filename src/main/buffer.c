@@ -1,4 +1,4 @@
-#include "buffer.h"
+#include "main/buffer.h"
 
 #include <malloc.h>
 #include <string.h>
