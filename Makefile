@@ -80,3 +80,6 @@ all_files = $(temp_all:.c=)
 !ENDIF
 
 !INCLUDE buildsystem\NMakeTemp.dep
+
+!IF [del buildsystem\NMakeTemp.dep]
+!ENDIF
