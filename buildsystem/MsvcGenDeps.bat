@@ -1,5 +1,5 @@
 @echo off
-echo build\%~1.msvc.dep: src\%~1.%4
+echo build\%~1.msvc.dep: src\%~1.%4 Configuration.mk
 echo.    %0 %1 %2 %3 %4 ^> build\%~1.msvc.dep
 
 echo build\%~1.msvc_d.obj: build\%~1.msvc.dep \

@@ -178,16 +178,16 @@ build/%.win_clang.o: build/%.win_clang.dep
 	$(clang_command) -o $@ -c $(win_clang_allflags) src/$*.$(source_ext)
 
 # Dependencies
-build/%.gcc.dep: src/%.$(source_ext)
+build/%.gcc.dep: src/%.$(source_ext) Configuration.mk
 	$(gcc_command) -c -MM -MP -MF $@ -MT "build/$*.gcc.o build/$*.gcc_d.o" $(gcc_allflags) src/$*.$(source_ext)
 
-build/%.clang.dep: src/%.$(source_ext)
+build/%.clang.dep: src/%.$(source_ext) Configuration.mk
 	$(clang_command) -c -MM -MP -MF $@ -MT "build/$*.clang.o build/$*.clang_d.o" $(clang_allflags) src/$*.$(source_ext)
 
-build/%.mingw.dep: src/%.$(source_ext)
+build/%.mingw.dep: src/%.$(source_ext) Configuration.mk
 	$(mingw_command) -c -MM -MP -MF $@ -MT "build/$*.mingw.o build/$*.mingw_d.o" $(mingw_allflags) src/$*.$(source_ext)
 
-build/%.win_clang.dep: src/%.$(source_ext)
+build/%.win_clang.dep: src/%.$(source_ext) Configuration.mk
 	$(clang_command) -c -MM -MP -MF $@ -MT "build/$*.win_clang.o build/$*.win_clang_d.o" $(win_clang_allflags) src/$*.$(source_ext)
 
 $(gcc_deps):
