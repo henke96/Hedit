@@ -30,7 +30,7 @@ test_windows_sources =
 test_linux_sources =
 
 # Flags
-gnu_flags = -Iinclude -DHEDIT_UNREACHABLE=__builtin_unreachable\(\) -std=c++17 -Wall -Wextra -Wpedantic -Wwrite-strings -fno-pie
+gnu_flags = -Iinclude -DHEDIT_UNREACHABLE=__builtin_unreachable\(\) -std=c11 -Wall -Wextra -Wpedantic -Wwrite-strings -fno-pie
 gnu_debug_flags = -g
 gnu_release_flags = -O3 -DNDEBUG -s
 gnu_windows_flags = -DHEDIT_WINDOWS
@@ -39,6 +39,6 @@ gcc_flags = -no-pie
 mingw_flags = -Wno-pedantic-ms-format
 clang_flags = -Wno-unused-command-line-argument
 
-msvc_flags = /Iinclude /DHEDIT_UNREACHABLE=__assume\(0\) /DHEDIT_WINDOWS /W4 /wd4204 /wd4127 /nologo /std:c++latest
+msvc_flags = /Iinclude /DHEDIT_UNREACHABLE=__assume\(0\) /DHEDIT_WINDOWS /W4 /wd4204 /wd4127 /nologo
 msvc_debug_flags = /Z7
 msvc_release_flags = /O2
