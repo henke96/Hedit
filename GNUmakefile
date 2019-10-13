@@ -74,7 +74,7 @@ win-test-release-clang: bin/test-release-clang.exe
 win-all: win-debug win-test-debug win-release win-test-release win-debug-clang win-test-debug-clang win-release-clang win-test-release-clang
 
 clean:
-	find bin/ -maxdepth 1 -type f -exec rm "{}" \;
+	rm -f bin/*
 	find build/ -maxdepth 1 -type f -exec rm "{}" \;
 	find build/ -type f -name "*.o" -exec rm "{}" \;
 	find build/ -type f -name "*.dep" -exec rm "{}" \;
@@ -180,7 +180,7 @@ $(win_clang_deps):
 
 include_gcc_deps = debug test-debug release test-release all
 include_clang_deps = debug-clang test-debug-clang release-clang test-release-clang all
-include_mingw_deps = win-debug win-test-debug win-release win-test-release win-all
+include_mingw_deps = win-debug win-test-debug win-release win-test-release win-all all
 include_win_clang_deps = win-debug-clang win-test-debug-clang win-release-clang win-test-release-clang win-all
 
 ifneq ($(filter $(MAKECMDGOALS),$(include_gcc_deps)),)

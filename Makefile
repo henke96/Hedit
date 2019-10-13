@@ -79,4 +79,4 @@ all_files = $(temp_all:.c=)
 "$(win_clang_allflags)"]
 !ENDIF
 
-!INCLUDE build\NMakeDeps.dep
+!INCLUDE buildsystem\NMakeTemp.dep
