@@ -23,7 +23,7 @@ main_linux_sources =
 # Test sources
 test_sources =\
 src/test/test.c\
-src/test/test_buffer.c
+src/test/buffer_test.c
 
 test_windows_sources =
 
