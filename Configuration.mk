@@ -17,7 +17,6 @@ main_sources =\
 src/main/main.c
 
 main_windows_sources =
-
 main_linux_sources =
 
 # Test sources
@@ -26,19 +25,31 @@ src/test/test.c\
 src/test/buffer_test.c
 
 test_windows_sources =
-
 test_linux_sources =
 
-# Flags
+# General flags
 gnu_flags = -Iinclude -DHEDIT_UNREACHABLE=__builtin_unreachable\(\) -std=c11 -Wall -Wextra -Wpedantic -Wwrite-strings -fno-pie
-gnu_debug_flags = -g
-gnu_release_flags = -O3 -DNDEBUG -s
+msvc_flags = /Iinclude /DHEDIT_UNREACHABLE=__assume\(0\) /DHEDIT_WINDOWS /W4 /wd4204 /wd4127 /nologo
+
+# Platform specific flags
 gnu_windows_flags = -DHEDIT_WINDOWS
 gnu_linux_flags = -DHEDIT_LINUX
+
+# Debug/Release flags
+gnu_debug_flags = -g
+gnu_release_flags = -O3 -DNDEBUG -s
+msvc_debug_flags = /Z7
+msvc_release_flags = /O2 /DNDEBUG
+
+# Compiler specifc flags
 gcc_flags = -no-pie
 mingw_flags = -Wno-pedantic-ms-format
 clang_flags = -Wno-unused-command-line-argument
 
-msvc_flags = /Iinclude /DHEDIT_UNREACHABLE=__assume\(0\) /DHEDIT_WINDOWS /W4 /wd4204 /wd4127 /nologo
-msvc_debug_flags = /Z7
-msvc_release_flags = /O2
+# Link flags
+gnu_windows_debug_link_flags = 
+gnu_windows_release_link_flags = 
+gnu_linux_debug_link_flags = 
+gnu_linux_release_link_flags = 
+msvc_debug_link_flags = 
+msvc_release_link_flags = 

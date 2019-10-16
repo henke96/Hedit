@@ -58,29 +58,29 @@ clean:
 
 # Main binaries
 bin\debug-msvc.exe: $(msvc_d_common_objs) $(msvc_d_main_objs)
-    cl /Fe$@ $(msvc_d_allflags) $**
+    cl /Fe$@ $(msvc_d_allflags) $** $(msvc_debug_link_flags)
 
 bin\release-msvc.exe: $(msvc_common_objs) $(msvc_main_objs)
-    cl /Fe$@ $(msvc_allflags) $**
+    cl /Fe$@ $(msvc_allflags) $** $(msvc_release_link_flags)
 
 bin\debug-clang.exe: $(win_clang_d_common_objs) $(win_clang_d_main_objs)
-	$(clang_command) -o $@ $(win_clang_d_allflags) $**
+	$(clang_command) -o $@ $(win_clang_d_allflags) $** $(gnu_windows_debug_link_flags)
 
 bin\release-clang.exe: $(win_clang_common_objs) $(win_clang_main_objs)
-	$(clang_command) -o $@ $(win_clang_allflags) $**
+	$(clang_command) -o $@ $(win_clang_allflags) $** $(gnu_windows_release_link_flags)
 
 # Test binaries
 bin\test-debug-msvc.exe: $(msvc_d_common_objs) $(msvc_d_test_objs)
-    cl /Fe$@ $(msvc_d_allflags) $**
+    cl /Fe$@ $(msvc_d_allflags) $** $(msvc_debug_link_flags)
 
 bin\test-release-msvc.exe: $(msvc_common_objs) $(msvc_test_objs)
-    cl /Fe$@ $(msvc_allflags) $**
+    cl /Fe$@ $(msvc_allflags) $** $(msvc_release_link_flags)
 
 bin\test-debug-clang.exe: $(win_clang_d_common_objs) $(win_clang_d_test_objs)
-	$(clang_command) -o $@ $(win_clang_d_allflags) $(win_clang_d_common_objs) $(win_clang_d_test_objs)
+	$(clang_command) -o $@ $(win_clang_d_allflags) $** $(gnu_windows_debug_link_flags)
 
 bin\test-release-clang.exe: $(win_clang_common_objs) $(win_clang_test_objs)
-	$(clang_command) -o $@ $(win_clang_allflags) $(win_clang_common_objs) $(win_clang_test_objs)
+	$(clang_command) -o $@ $(win_clang_allflags) $**  $(gnu_windows_release_link_flags)
 
 # Dependencies
 temp_all = $(win_all_sources:src/=)
