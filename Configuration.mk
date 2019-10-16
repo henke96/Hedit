@@ -37,21 +37,21 @@ gnu_linux_flags = -DHEDIT_LINUX
 
 # Debug/Release flags
 gnu_debug_flags = -g
-gnu_release_flags = -O3 -DNDEBUG -s
+gnu_release_flags = -O3 -DNDEBUG
 msvc_debug_flags = /Z7
 msvc_release_flags = /O2 /DNDEBUG
 
-# Compiler specifc flags
+# Compiler specific flags
 gcc_flags = -no-pie
 mingw_flags = -Wno-pedantic-ms-format
-clang_flags = -Wno-unused-command-line-argument
+clang_flags =
 
 # Link flags
 linux_debug_link_flags = 
-linux_release_link_flags = 
+linux_release_link_flags = -Wl,-s
 mingw_windows_debug_link_flags =
-mingw_windows_release_link_flags =
+mingw_windows_release_link_flags = -Wl,-s
 clang_windows_debug_link_flags =
-clang_windows_release_link_flags =
+clang_windows_release_link_flags = -Wl,-s
 msvc_debug_link_flags = 
 msvc_release_link_flags = 
