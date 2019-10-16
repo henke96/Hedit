@@ -109,53 +109,53 @@ bin:
 
 # Main binaries
 bin/debug-gcc: $(gcc_d_common_objs) $(gcc_d_main_objs) | bin
-	$(gcc_command) -o $@ $(gcc_d_allflags) $^ $(gnu_linux_debug_link_flags)
+	$(gcc_command) -o $@ $(gcc_d_allflags) $^ $(linux_debug_link_flags)
 
 bin/release-gcc: $(gcc_common_objs) $(gcc_main_objs) | bin
-	$(gcc_command) -o $@ $(gcc_allflags) $^ $(gnu_linux_release_link_flags)
+	$(gcc_command) -o $@ $(gcc_allflags) $^ $(linux_release_link_flags)
 
 bin/debug-clang: $(clang_d_common_objs) $(clang_d_main_objs) | bin
-	$(clang_command) -o $@ $(clang_d_allflags) $^ $(gnu_linux_debug_link_flags)
+	$(clang_command) -o $@ $(clang_d_allflags) $^ $(linux_debug_link_flags)
 
 bin/release-clang: $(clang_common_objs) $(clang_main_objs) | bin
-	$(clang_command) -o $@ $(clang_allflags) $^ $(gnu_linux_release_link_flags)
+	$(clang_command) -o $@ $(clang_allflags) $^ $(linux_release_link_flags)
 
 bin/debug-mingw.exe: $(mingw_d_common_objs) $(mingw_d_main_objs) | bin
-	$(mingw_command) -o $@ $(mingw_d_allflags) $^ $(gnu_windows_debug_link_flags)
+	$(mingw_command) -o $@ $(mingw_d_allflags) $^ $(mingw_windows_debug_link_flags)
 
 bin/release-mingw.exe: $(mingw_common_objs) $(mingw_main_objs) | bin
-	$(mingw_command) -o $@ $(mingw_allflags) $^ $(gnu_windows_release_link_flags)
+	$(mingw_command) -o $@ $(mingw_allflags) $^ $(mingw_windows_release_link_flags)
 
 bin/debug-clang.exe: $(win_clang_d_common_objs) $(win_clang_d_main_objs) | bin
-	$(clang_command) -o $@ $(win_clang_d_allflags) $^ $(gnu_windows_debug_link_flags)
+	$(clang_command) -o $@ $(win_clang_d_allflags) $^ $(clang_windows_debug_link_flags)
 
 bin/release-clang.exe: $(win_clang_common_objs) $(win_clang_main_objs) | bin
-	$(clang_command) -o $@ $(win_clang_allflags) $^ $(gnu_windows_release_link_flags)
+	$(clang_command) -o $@ $(win_clang_allflags) $^ $(clang_windows_release_link_flags)
 
 # Test binaries
 bin/test-debug-gcc: $(gcc_d_common_objs) $(gcc_d_test_objs) | bin
-	$(gcc_command) -o $@ $(gcc_d_allflags) $^ $(gnu_linux_debug_link_flags)
+	$(gcc_command) -o $@ $(gcc_d_allflags) $^ $(linux_debug_link_flags)
 
 bin/test-release-gcc: $(gcc_common_objs) $(gcc_test_objs) | bin
-	$(gcc_command) -o $@ $(gcc_allflags) $^ $(gnu_linux_release_link_flags)
+	$(gcc_command) -o $@ $(gcc_allflags) $^ $(linux_release_link_flags)
 
 bin/test-debug-clang: $(clang_d_common_objs) $(clang_d_test_objs) | bin
-	$(clang_command) -o $@ $(clang_d_allflags) $^ $(gnu_linux_debug_link_flags)
+	$(clang_command) -o $@ $(clang_d_allflags) $^ $(linux_debug_link_flags)
 
 bin/test-release-clang: $(clang_common_objs) $(clang_test_objs) | bin
-	$(clang_command) -o $@ $(clang_allflags) $^ $(gnu_linux_release_link_flags)
+	$(clang_command) -o $@ $(clang_allflags) $^ $(linux_release_link_flags)
 
 bin/test-debug-mingw.exe: $(mingw_d_common_objs) $(mingw_d_test_objs) | bin
-	$(mingw_command) -o $@ $(mingw_d_allflags) $^ $(gnu_windows_debug_link_flags)
+	$(mingw_command) -o $@ $(mingw_d_allflags) $^ $(mingw_windows_debug_link_flags)
 
 bin/test-release-mingw.exe: $(mingw_common_objs) $(mingw_test_objs) | bin
-	$(mingw_command) -o $@ $(mingw_allflags) $^ $(gnu_windows_release_link_flags)
+	$(mingw_command) -o $@ $(mingw_allflags) $^ $(mingw_windows_release_link_flags)
 
 bin/test-debug-clang.exe: $(win_clang_d_common_objs) $(win_clang_d_test_objs) | bin
-	$(clang_command) -o $@ $(win_clang_d_allflags) $^ $(gnu_windows_debug_link_flags)
+	$(clang_command) -o $@ $(win_clang_d_allflags) $^ $(clang_windows_debug_link_flags)
 
 bin/test-release-clang.exe: $(win_clang_common_objs) $(win_clang_test_objs) | bin
-	$(clang_command) -o $@ $(win_clang_allflags) $^ $(gnu_windows_release_link_flags)
+	$(clang_command) -o $@ $(win_clang_allflags) $^ $(clang_windows_release_link_flags)
 
 # Objects
 build/%.gcc_d.o: build/%.gcc.dep

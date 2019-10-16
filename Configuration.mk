@@ -47,9 +47,11 @@ mingw_flags = -Wno-pedantic-ms-format
 clang_flags = -Wno-unused-command-line-argument
 
 # Link flags
-gnu_windows_debug_link_flags = 
-gnu_windows_release_link_flags = 
-gnu_linux_debug_link_flags = 
-gnu_linux_release_link_flags = 
+linux_debug_link_flags = 
+linux_release_link_flags = 
+mingw_windows_debug_link_flags =
+mingw_windows_release_link_flags =
+clang_windows_debug_link_flags =
+clang_windows_release_link_flags =
 msvc_debug_link_flags = 
 msvc_release_link_flags = 
