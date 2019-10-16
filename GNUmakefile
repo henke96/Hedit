@@ -75,7 +75,10 @@ test-release: bin/test-release-gcc
 test-debug-clang: bin/test-debug-clang
 test-release-clang: bin/test-release-clang
 
-all: debug test-debug release test-release debug-clang test-debug-clang release-clang test-release-clang win-debug win-test-debug win-release win-test-release
+main-all: debug release debug-clang release-clang win-debug win-release
+test-all: test-debug test-release test-debug-clang test-release-clang win-test-debug win-test-release
+
+all: main-all test-all
 
 win-debug: bin/debug-mingw.exe
 win-release: bin/release-mingw.exe
@@ -86,7 +89,10 @@ win-test-release: bin/test-release-mingw.exe
 win-test-debug-clang: bin/test-debug-clang.exe
 win-test-release-clang: bin/test-release-clang.exe
 
-win-all: win-debug win-test-debug win-release win-test-release win-debug-clang win-test-debug-clang win-release-clang win-test-release-clang
+win-main-all: win-debug win-release win-debug-clang win-release-clang
+win-test-all: win-test-debug win-test-release win-test-debug-clang win-test-release-clang
+
+win-all: win-main-all win-test-all
 
 clean:
 	rm -f bin/*
@@ -194,10 +200,10 @@ $(clang_deps):
 $(mingw_deps):
 $(win_clang_deps):
 
-include_gcc_deps = debug test-debug release test-release all
-include_clang_deps = debug-clang test-debug-clang release-clang test-release-clang all
-include_mingw_deps = win-debug win-test-debug win-release win-test-release win-all all
-include_win_clang_deps = win-debug-clang win-test-debug-clang win-release-clang win-test-release-clang win-all
+include_gcc_deps = debug test-debug release test-release main-all test-all all
+include_clang_deps = debug-clang test-debug-clang release-clang test-release-clang main-all test-all all
+include_mingw_deps = win-debug win-test-debug win-release win-test-release win-main-all win-test-all win-all main-all test-all all
+include_win_clang_deps = win-debug-clang win-test-debug-clang win-release-clang win-test-release-clang win-main-all win-test-all win-all
 
 ifneq ($(filter $(MAKECMDGOALS),$(include_gcc_deps)),)
 include $(wildcard $(gcc_deps))

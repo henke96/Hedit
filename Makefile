@@ -51,7 +51,9 @@ test-release: bin\test-release-msvc.exe
 test-debug-clang: bin\test-debug-clang.exe
 test-release-clang: bin\test-release-clang.exe
 
-all: debug test-debug release test-release debug-clang test-debug-clang release-clang test-release-clang
+main-all: debug release debug-clang release-clang
+test-all: test-debug test-release test-debug-clang test-release-clang
+all: main-all test-all
 
 clean:
     buildsystem\clean.bat
