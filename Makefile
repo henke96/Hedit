@@ -89,9 +89,7 @@ temp_all = $(win_all_sources:src/=)
 all_files = $(temp_all:.c=)
 
 !IF [buildsystem\NMakeHelper.bat "$(all_files)" \
-"$(msvc_d_allflags)" \
 "$(msvc_allflags)" \
-"$(win_clang_d_allflags)" \
 "$(win_clang_allflags)" \
 $(source_ext) \
 $(clang_command) \
