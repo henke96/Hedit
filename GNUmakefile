@@ -75,7 +75,7 @@ test-release: bin/test-release-gcc
 test-debug-clang: bin/test-debug-clang
 test-release-clang: bin/test-release-clang
 
-ifneq ($(all_test_sources),)
+ifneq ($(strip $(all_test_sources)),)
 test_targets = test-debug test-release test-debug-clang test-release-clang win-test-debug win-test-release
 else
 test_targets =
@@ -91,8 +91,8 @@ win-test-debug: bin/test-debug-mingw.exe
 win-test-release: bin/test-release-mingw.exe
 win-test-debug-clang: bin/test-debug-clang.exe
 win-test-release-clang: bin/test-release-clang.exe
- 
-ifneq ($(strip $(all_test_sources)),)
+
+ifneq ($(strip $(win_all_test_sources)),)
 win_test_targets = win-test-debug win-test-release win-test-debug-clang win-test-release-clang
 else
 win_test_targets =
