@@ -51,9 +51,13 @@ test-release: bin\test-release-msvc.exe
 test-debug-clang: bin\test-debug-clang.exe
 test-release-clang: bin\test-release-clang.exe
 
-main-all: debug release debug-clang release-clang
-test-all: test-debug test-release test-debug-clang test-release-clang
-all: main-all test-all
+!IF "$(win_all_test_sources)"==" "
+test_targets =
+!ELSE
+test_targets = test-debug test-release test-debug-clang test-release-clang
+!ENDIF
+
+all: debug release debug-clang release-clang $(test_targets)
 
 clean:
     buildsystem\clean.bat
