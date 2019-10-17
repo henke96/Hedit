@@ -13,9 +13,9 @@ if %ERRORLEVEL%==0 (
 where clang >nul 2>&1
 if %ERRORLEVEL%==0 (
     for %%X in (%~1) do (
-        if not exist "build\%%X.nm_win_clang.dep" (
-            call buildsystem\ClangGenDeps.bat "%%X" %3 %4 %5 > "build\%%X.nm_win_clang.dep"
+        if not exist "build\%%X.win_clang.dep" (
+            call buildsystem\ClangGenDeps.bat "%%X" %3 %4 %5 > "build\%%X.win_clang.dep"
         )
-        echo !INCLUDE build\%%X.nm_win_clang.dep >> buildsystem\NMakeTemp.dep
+        echo !INCLUDE build\%%X.win_clang.dep >> buildsystem\NMakeTemp.dep
     )
 )

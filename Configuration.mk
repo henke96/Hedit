@@ -1,57 +1,70 @@
 # Language? C (0) or C++ (1)
-cpp = 0
+CPP = 0
 
 # Common sources
-common_sources =\
+COMMON_SOURCES =\
 src/main/buffer.c\
 src/main/file/fileWriter.c
 
-common_windows_sources =\
+COMMON_WINDOWS_SOURCES =\
 src/main/file/windows/fileMapping.c
 
-common_linux_sources =\
+COMMON_LINUX_SOURCES =\
 src/main/file/linux/fileMapping.c
 
 # Main sources
-main_sources =\
+MAIN_SOURCES =\
 src/main/main.c
 
-main_windows_sources =
-main_linux_sources =
+MAIN_WINDOWS_SOURCES =
+MAIN_LINUX_SOURCES =
 
 # Test sources
-test_sources =\
+TEST_SOURCES =\
 src/test/test.c\
 src/test/buffer_test.c
 
-test_windows_sources =
-test_linux_sources =
+TEST_WINDOWS_SOURCES =
+TEST_LINUX_SOURCES =
 
-# General flags
-gnu_flags = -Iinclude -DHEDIT_UNREACHABLE=__builtin_unreachable\(\) -std=c11 -Wall -Wextra -Wpedantic -Wwrite-strings -fno-pie
-msvc_flags = /Iinclude /DHEDIT_UNREACHABLE=__assume\(0\) /DHEDIT_WINDOWS /W4 /wd4204 /wd4127 /nologo
+gnu_flags = -Iinclude -DHEDIT_UNREACHABLE=__builtin_unreachable\(\) -DHEDIT_LINUX -std=c11 -Wall -Wextra -Wpedantic -Wwrite-strings -fno-pie -no-pie
 
-# Platform specific flags
-gnu_windows_flags = -DHEDIT_WINDOWS
-gnu_linux_flags = -DHEDIT_LINUX
+# Linux compile flags
+GCC_DEBUG_FLAGS = $(gnu_flags) -DHEDIT_LINUX -g
+GCC_RELEASE_FLAGS = $(gnu_flags) -DHEDIT_LINUX -O3
 
-# Debug/Release flags
-gnu_debug_flags = -g
-gnu_release_flags = -O3 -DNDEBUG
-msvc_debug_flags = /Z7
-msvc_release_flags = /O2 /DNDEBUG
+CLANG_DEBUG_FLAGS = $(gnu_flags) -DHEDIT_LINUX -g
+CLANG_RELEASE_FLAGS = $(gnu_flags) -DHEDIT_LINUX -O3
 
-# Compiler specific flags
-gcc_flags = -no-pie
-mingw_flags = -Wno-pedantic-ms-format
-clang_flags =
+# Windows compile flags
+MINGW_DEBUG_FLAGS = $(gnu_flags) -DHEDIT_WINDOWS -g
+MINGW_RELEASE_FLAGS = $(gnu_flags) -DHEDIT_WINDOWS -O3
 
-# Link flags
-linux_debug_link_flags = 
-linux_release_link_flags = -Wl,-s
-mingw_windows_debug_link_flags =
-mingw_windows_release_link_flags = -Wl,-s
-clang_windows_debug_link_flags =
-clang_windows_release_link_flags = -Wl,-s
-msvc_debug_link_flags = 
-msvc_release_link_flags = 
+WIN_GNU_CLANG_DEBUG_FLAGS = $(gnu_flags) -DHEDIT_WINDOWS -g
+WIN_GNU_CLANG_RELEASE_FLAGS = $(gnu_flags) -DHEDIT_WINDOWS -O3
+
+WIN_CLANG_DEBUG_FLAGS = $(gnu_flags) -DHEDIT_WINDOWS -g
+WIN_CLANG_RELEASE_FLAGS = $(gnu_flags) -DHEDIT_WINDOWS -O3
+
+MSVC_DEBUG_FLAGS = /Iinclude /DHEDIT_UNREACHABLE=__assume\(0\) /DHEDIT_WINDOWS /std:c++latest /W4 /nologo /Z7
+MSVC_RELEASE_FLAGS = /Iinclude /DHEDIT_UNREACHABLE=__assume\(0\) /DHEDIT_WINDOWS /std:c++latest /W4 /nologo /O2
+
+# Linux link flags
+GCC_DEBUG_LINK_FLAGS =
+GCC_RELEASE_LINK_FLAGS = -Wl,-s
+
+CLANG_DEBUG_LINK_FLAGS =
+CLANG_RELEASE_LINK_FLAGS = -Wl,-s
+
+# Windows link flags
+MINGW_DEBUG_LINK_FLAGS =
+MINGW_RELEASE_LINK_FLAGS = -Wl,-s
+
+WIN_GNU_CLANG_DEBUG_LINK_FLAGS =
+WIN_GNU_CLANG_RELEASE_LINK_FLAGS = -Wl,-s
+
+WIN_CLANG_DEBUG_LINK_FLAGS =
+WIN_CLANG_RELEASE_LINK_FLAGS =
+
+MSVC_DEBUG_LINK_FLAGS =
+MSVC_RELEASE_LINK_FLAGS =
