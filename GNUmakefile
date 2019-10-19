@@ -30,6 +30,7 @@ gcc_deps = $(all_sources:src/%.$(source_ext)=build/%.gcc.dep)
 gcc_common_objs = $(all_common_sources:src/%.$(source_ext)=build/%.gcc.o)
 gcc_main_objs = $(all_main_sources:src/%.$(source_ext)=build/%.gcc.o)
 gcc_test_objs = $(all_test_sources:src/%.$(source_ext)=build/%.gcc.o)
+gcc_d_deps = $(all_sources:src/%.$(source_ext)=build/%.gcc_d.dep)
 gcc_d_common_objs = $(all_common_sources:src/%.$(source_ext)=build/%.gcc_d.o)
 gcc_d_main_objs = $(all_main_sources:src/%.$(source_ext)=build/%.gcc_d.o)
 gcc_d_test_objs = $(all_test_sources:src/%.$(source_ext)=build/%.gcc_d.o)
@@ -38,6 +39,7 @@ clang_deps = $(all_sources:src/%.$(source_ext)=build/%.clang.dep)
 clang_common_objs = $(all_common_sources:src/%.$(source_ext)=build/%.clang.o)
 clang_main_objs = $(all_main_sources:src/%.$(source_ext)=build/%.clang.o)
 clang_test_objs = $(all_test_sources:src/%.$(source_ext)=build/%.clang.o)
+clang_d_deps = $(all_sources:src/%.$(source_ext)=build/%.clang_d.dep)
 clang_d_common_objs = $(all_common_sources:src/%.$(source_ext)=build/%.clang_d.o)
 clang_d_main_objs = $(all_main_sources:src/%.$(source_ext)=build/%.clang_d.o)
 clang_d_test_objs = $(all_test_sources:src/%.$(source_ext)=build/%.clang_d.o)
@@ -46,6 +48,7 @@ mingw_deps = $(win_all_sources:src/%.$(source_ext)=build/%.mingw.dep)
 mingw_common_objs = $(win_all_common_sources:src/%.$(source_ext)=build/%.mingw.o)
 mingw_main_objs = $(win_all_main_sources:src/%.$(source_ext)=build/%.mingw.o)
 mingw_test_objs = $(win_all_test_sources:src/%.$(source_ext)=build/%.mingw.o)
+mingw_d_deps = $(win_all_sources:src/%.$(source_ext)=build/%.mingw_d.dep)
 mingw_d_common_objs = $(win_all_common_sources:src/%.$(source_ext)=build/%.mingw_d.o)
 mingw_d_main_objs = $(win_all_main_sources:src/%.$(source_ext)=build/%.mingw_d.o)
 mingw_d_test_objs = $(win_all_test_sources:src/%.$(source_ext)=build/%.mingw_d.o)
@@ -54,6 +57,7 @@ win_clang_deps = $(win_all_sources:src/%.$(source_ext)=build/%.win_gnu_clang.dep
 win_clang_common_objs = $(win_all_common_sources:src/%.$(source_ext)=build/%.win_gnu_clang.o)
 win_clang_main_objs = $(win_all_main_sources:src/%.$(source_ext)=build/%.win_gnu_clang.o)
 win_clang_test_objs = $(win_all_test_sources:src/%.$(source_ext)=build/%.win_gnu_clang.o)
+win_clang_d_deps = $(win_all_sources:src/%.$(source_ext)=build/%.win_gnu_clang_d.dep)
 win_clang_d_common_objs = $(win_all_common_sources:src/%.$(source_ext)=build/%.win_gnu_clang_d.o)
 win_clang_d_main_objs = $(win_all_main_sources:src/%.$(source_ext)=build/%.win_gnu_clang_d.o)
 win_clang_d_test_objs = $(win_all_test_sources:src/%.$(source_ext)=build/%.win_gnu_clang_d.o)
@@ -162,61 +166,93 @@ bin/test-release-gnu-clang.exe: $(win_clang_common_objs) $(win_clang_test_objs)
 	$(clang_command) -o $@ $(WIN_GNU_CLANG_RELEASE_FLAGS) $^ $(WIN_GNU_CLANG_RELEASE_LINK_FLAGS)
 
 # Objects
-build/%.gcc_d.o: build/%.gcc.dep
+build/%.gcc_d.o: build/%.gcc_d.dep
 	$(gcc_command) -o $@ -c $(GCC_DEBUG_FLAGS) src/$*.$(source_ext)
 
 build/%.gcc.o: build/%.gcc.dep
 	$(gcc_command) -o $@ -c $(GCC_RELEASE_FLAGS) src/$*.$(source_ext)
 
-build/%.clang_d.o: build/%.clang.dep
+build/%.clang_d.o: build/%.clang_d.dep
 	$(clang_command) -o $@ -c $(CLANG_DEBUG_FLAGS) src/$*.$(source_ext)
 
 build/%.clang.o: build/%.clang.dep
 	$(clang_command) -o $@ -c $(CLANG_RELEASE_FLAGS) src/$*.$(source_ext)
 
-build/%.mingw_d.o: build/%.mingw.dep
+build/%.mingw_d.o: build/%.mingw_d.dep
 	$(mingw_command) -o $@ -c $(MINGW_DEBUG_FLAGS) src/$*.$(source_ext)
 
 build/%.mingw.o: build/%.mingw.dep
 	$(mingw_command) -o $@ -c $(MINGW_RELEASE_FLAGS) src/$*.$(source_ext)
 
-build/%.win_gnu_clang_d.o: build/%.win_gnu_clang.dep
+build/%.win_gnu_clang_d.o: build/%.win_gnu_clang_d.dep
 	$(clang_command) -o $@ -c $(WIN_GNU_CLANG_DEBUG_FLAGS) src/$*.$(source_ext)
 
 build/%.win_gnu_clang.o: build/%.win_gnu_clang.dep
 	$(clang_command) -o $@ -c $(WIN_GNU_CLANG_RELEASE_FLAGS) src/$*.$(source_ext)
 
 # Dependencies
+build/%.gcc_d.dep: src/%.$(source_ext) Configuration.mk
+	$(gcc_command) -c -MM -MP -MF $@ -MT build/$*.gcc_d.o $(GCC_DEBUG_FLAGS) src/$*.$(source_ext)
+
 build/%.gcc.dep: src/%.$(source_ext) Configuration.mk
-	$(gcc_command) -c -MM -MP -MF $@ -MT "build/$*.gcc.o build/$*.gcc_d.o" $(GCC_RELEASE_FLAGS) src/$*.$(source_ext)
+	$(gcc_command) -c -MM -MP -MF $@ -MT build/$*.gcc.o $(GCC_RELEASE_FLAGS) src/$*.$(source_ext)
+
+build/%.clang_d.dep: src/%.$(source_ext) Configuration.mk
+	$(clang_command) -c -MM -MP -MF $@ -MT build/$*.clang_d.o $(CLANG_DEBUG_FLAGS) src/$*.$(source_ext)
 
 build/%.clang.dep: src/%.$(source_ext) Configuration.mk
-	$(clang_command) -c -MM -MP -MF $@ -MT "build/$*.clang.o build/$*.clang_d.o" $(CLANG_RELEASE_FLAGS) src/$*.$(source_ext)
+	$(clang_command) -c -MM -MP -MF $@ -MT build/$*.clang.o $(CLANG_RELEASE_FLAGS) src/$*.$(source_ext)
+
+build/%.mingw_d.dep: src/%.$(source_ext) Configuration.mk
+	$(mingw_command) -c -MM -MP -MF $@ -MT build/$*.mingw_d.o $(MINGW_DEBUG_FLAGS) src/$*.$(source_ext)
 
 build/%.mingw.dep: src/%.$(source_ext) Configuration.mk
-	$(mingw_command) -c -MM -MP -MF $@ -MT "build/$*.mingw.o build/$*.mingw_d.o" $(MINGW_RELEASE_FLAGS) src/$*.$(source_ext)
+	$(mingw_command) -c -MM -MP -MF $@ -MT build/$*.mingw.o $(MINGW_RELEASE_FLAGS) src/$*.$(source_ext)
+
+build/%.win_gnu_clang_d.dep: src/%.$(source_ext) Configuration.mk
+	$(clang_command) -c -MM -MP -MF $@ -MT build/$*.win_gnu_clang_d.o $(WIN_GNU_CLANG_DEBUG_FLAGS) src/$*.$(source_ext)
 
 build/%.win_gnu_clang.dep: src/%.$(source_ext) Configuration.mk
-	$(clang_command) -c -MM -MP -MF $@ -MT "build/$*.win_gnu_clang.o build/$*.win_gnu_clang_d.o" $(WIN_GNU_CLANG_RELEASE_FLAGS) src/$*.$(source_ext)
+	$(clang_command) -c -MM -MP -MF $@ -MT build/$*.win_gnu_clang.o $(WIN_GNU_CLANG_RELEASE_FLAGS) src/$*.$(source_ext)
 
+$(gcc_d_deps):
 $(gcc_deps):
+$(clang_d_deps):
 $(clang_deps):
+$(mingw_d_deps):
 $(mingw_deps):
+$(win_clang_d_deps):
 $(win_clang_deps):
 
-include_gcc_deps = debug test-debug release test-release all
-include_clang_deps = debug-clang test-debug-clang release-clang test-release-clang all-clang
-include_mingw_deps = win-debug win-test-debug win-release win-test-release win-all
-include_win_clang_deps = win-debug-clang win-test-debug-clang win-release-clang win-test-release-clang win-all-clang
+include_gcc_d_deps = debug test-debug all
+include_gcc_deps = release test-release all
+include_clang_d_deps = debug-clang test-debug-clang all-clang
+include_clang_deps = release-clang test-release-clang all-clang
+include_mingw_d_deps = win-debug win-test-debug win-all
+include_mingw_deps = win-release win-test-release win-all
+include_win_clang_d_deps = win-debug-clang win-test-debug-clang win-all-clang
+include_win_clang_deps = win-release-clang win-test-release-clang win-all-clang
 
+ifneq ($(filter $(MAKECMDGOALS),$(include_gcc_d_deps)),)
+include $(wildcard $(gcc_d_deps))
+endif
 ifneq ($(filter $(MAKECMDGOALS),$(include_gcc_deps)),)
 include $(wildcard $(gcc_deps))
+endif
+ifneq ($(filter $(MAKECMDGOALS),$(include_clang_d_deps)),)
+include $(wildcard $(clang_d_deps))
 endif
 ifneq ($(filter $(MAKECMDGOALS),$(include_clang_deps)),)
 include $(wildcard $(clang_deps))
 endif
+ifneq ($(filter $(MAKECMDGOALS),$(include_mingw_d_deps)),)
+include $(wildcard $(mingw_d_deps))
+endif
 ifneq ($(filter $(MAKECMDGOALS),$(include_mingw_deps)),)
 include $(wildcard $(mingw_deps))
+endif
+ifneq ($(filter $(MAKECMDGOALS),$(include_win_clang_d_deps)),)
+include $(wildcard $(win_clang_d_deps))
 endif
 ifneq ($(filter $(MAKECMDGOALS),$(include_win_clang_deps)),)
 include $(wildcard $(win_clang_deps))

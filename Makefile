@@ -91,12 +91,7 @@ bin\test-release-clang.exe: $(win_clang_common_objs) $(win_clang_test_objs)
 temp_all = $(win_all_sources:src/=)
 all_files = $(temp_all:.c=)
 
-!IF [buildsystem\NMakeHelper.bat "$(all_files)" \
-"$(MSVC_RELEASE_FLAGS)" \
-"$(WIN_CLANG_RELEASE_FLAGS)" \
-$(source_ext) \
-$(clang_command) \
-]
+!IF [buildsystem\NMakeHelper.bat "$(all_files)" $(source_ext)]
 !ENDIF
 
 !INCLUDE build\NMakeTemp.mk

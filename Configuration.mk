@@ -31,23 +31,23 @@ gnu_flags = -Iinclude -DHEDIT_UNREACHABLE=__builtin_unreachable\(\) -std=c11 -Wa
 
 # Linux compile flags
 GCC_DEBUG_FLAGS = $(gnu_flags) -no-pie -DHEDIT_LINUX -g
-GCC_RELEASE_FLAGS = $(gnu_flags) -no-pie -DHEDIT_LINUX -O3
+GCC_RELEASE_FLAGS = $(gnu_flags) -no-pie -DHEDIT_LINUX -DNDEBUG -O3
 
 CLANG_DEBUG_FLAGS = $(gnu_flags) -DHEDIT_LINUX -g
-CLANG_RELEASE_FLAGS = $(gnu_flags) -DHEDIT_LINUX -O3
+CLANG_RELEASE_FLAGS = $(gnu_flags) -DHEDIT_LINUX -DNDEBUG -O3
 
 # Windows compile flags
 MINGW_DEBUG_FLAGS = $(gnu_flags) -no-pie -DHEDIT_WINDOWS -g
-MINGW_RELEASE_FLAGS = $(gnu_flags) -no-pie -DHEDIT_WINDOWS -O3
+MINGW_RELEASE_FLAGS = $(gnu_flags) -no-pie -DHEDIT_WINDOWS -DNDEBUG -O3
 
 WIN_GNU_CLANG_DEBUG_FLAGS = $(gnu_flags) -target x86_64-pc-windows-gnu -DHEDIT_WINDOWS -g
-WIN_GNU_CLANG_RELEASE_FLAGS = $(gnu_flags) -target x86_64-pc-windows-gnu -DHEDIT_WINDOWS -O3
+WIN_GNU_CLANG_RELEASE_FLAGS = $(gnu_flags) -target x86_64-pc-windows-gnu -DHEDIT_WINDOWS -DNDEBUG -O3
 
 WIN_CLANG_DEBUG_FLAGS = $(gnu_flags) -target x86_64-pc-windows-msvc -DHEDIT_WINDOWS -g
-WIN_CLANG_RELEASE_FLAGS = $(gnu_flags) -target x86_64-pc-windows-msvc -DHEDIT_WINDOWS -O3
+WIN_CLANG_RELEASE_FLAGS = $(gnu_flags) -target x86_64-pc-windows-msvc -DHEDIT_WINDOWS -DNDEBUG -O3
 
 MSVC_DEBUG_FLAGS = /Iinclude /DHEDIT_UNREACHABLE=__assume\(0\) /DHEDIT_WINDOWS /std:c++latest /W4 /nologo /Z7
-MSVC_RELEASE_FLAGS = /Iinclude /DHEDIT_UNREACHABLE=__assume\(0\) /DHEDIT_WINDOWS /std:c++latest /W4 /nologo /O2
+MSVC_RELEASE_FLAGS = /Iinclude /DHEDIT_UNREACHABLE=__assume\(0\) /DHEDIT_WINDOWS /std:c++latest /W4 /nologo /DNDEBUG /O2
 
 # Linux link flags
 GCC_DEBUG_LINK_FLAGS =
