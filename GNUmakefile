@@ -108,7 +108,7 @@ $(shell buildsystem\createDirs.bat)
 clean:
 	buildsystem\clean.bat
 else
-$(shell mkdir -p bin; find src -type d -exec mkdir -p -- build/{} \;)
+$(shell mkdir -p bin; cd src && find . -type d -exec mkdir -p -- ../build/{} \;)
 
 clean:
 	rm -rf bin
