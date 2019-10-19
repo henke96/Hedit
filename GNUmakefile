@@ -98,7 +98,7 @@ endif
 win-all: win-debug win-release $(win_test_targets)
 win-all-clang: win-debug-clang win-release-clang $(win_test_clang_targets)
 
-ifneq ($(OS), Windows_NT)
+ifeq ($(OS), Windows_NT)
 $(shell buildsystem\createDirs.bat)
 
 clean:
