@@ -98,67 +98,67 @@ endif
 win-all: win-debug win-release $(win_test_targets)
 win-all-clang: win-debug-clang win-release-clang $(win_test_clang_targets)
 
+ifneq ($(OS), Windows_NT)
+$(shell buildsystem\createDirs.bat)
+
 clean:
-	rm -f bin/*
-	find build/ -type f -name "*.o" -exec rm "{}" \;
-	find build/ -type f -name "*.dep" -exec rm "{}" \;
-	find build/ -type f -name "*.pdb" -exec rm "{}" \;
-	find build/ -type f -name "*.obj" -exec rm "{}" \;
-
-win-clean:
 	buildsystem\clean.bat
+else
+$(shell mkdir -p bin; find src -type d -exec mkdir -p -- build/{} \;)
 
-bin:
-	mkdir bin
+clean:
+	rm -rf bin
+	rm -rf build
+endif
 
 # Main binaries
-bin/debug-gcc: $(gcc_d_common_objs) $(gcc_d_main_objs) | bin
+bin/debug-gcc: $(gcc_d_common_objs) $(gcc_d_main_objs)
 	$(gcc_command) -o $@ $(GCC_DEBUG_FLAGS) $^ $(GCC_DEBUG_LINK_FLAGS)
 
-bin/release-gcc: $(gcc_common_objs) $(gcc_main_objs) | bin
+bin/release-gcc: $(gcc_common_objs) $(gcc_main_objs)
 	$(gcc_command) -o $@ $(GCC_RELEASE_FLAGS) $^ $(GCC_RELEASE_LINK_FLAGS)
 
-bin/debug-clang: $(clang_d_common_objs) $(clang_d_main_objs) | bin
+bin/debug-clang: $(clang_d_common_objs) $(clang_d_main_objs)
 	$(clang_command) -o $@ $(CLANG_DEBUG_FLAGS) $^ $(CLANG_DEBUG_LINK_FLAGS)
 
-bin/release-clang: $(clang_common_objs) $(clang_main_objs) | bin
+bin/release-clang: $(clang_common_objs) $(clang_main_objs)
 	$(clang_command) -o $@ $(CLANG_RELEASE_FLAGS) $^ $(CLANG_RELEASE_LINK_FLAGS)
 
-bin/debug-mingw.exe: $(mingw_d_common_objs) $(mingw_d_main_objs) | bin
+bin/debug-mingw.exe: $(mingw_d_common_objs) $(mingw_d_main_objs)
 	$(mingw_command) -o $@ $(MINGW_DEBUG_FLAGS) $^ $(MINGW_DEBUG_LINK_FLAGS)
 
-bin/release-mingw.exe: $(mingw_common_objs) $(mingw_main_objs) | bin
+bin/release-mingw.exe: $(mingw_common_objs) $(mingw_main_objs)
 	$(mingw_command) -o $@ $(MINGW_RELEASE_FLAGS) $^ $(MINGW_RELEASE_LINK_FLAGS)
 
-bin/debug-gnu-clang.exe: $(win_clang_d_common_objs) $(win_clang_d_main_objs) | bin
+bin/debug-gnu-clang.exe: $(win_clang_d_common_objs) $(win_clang_d_main_objs)
 	$(clang_command) -o $@ $(WIN_GNU_CLANG_DEBUG_FLAGS) $^ $(WIN_GNU_CLANG_DEBUG_LINK_FLAGS)
 
-bin/release-gnu-clang.exe: $(win_clang_common_objs) $(win_clang_main_objs) | bin
+bin/release-gnu-clang.exe: $(win_clang_common_objs) $(win_clang_main_objs)
 	$(clang_command) -o $@ $(WIN_GNU_CLANG_RELEASE_FLAGS) $^ $(WIN_GNU_CLANG_RELEASE_LINK_FLAGS)
 
 # Test binaries
-bin/test-debug-gcc: $(gcc_d_common_objs) $(gcc_d_test_objs) | bin
+bin/test-debug-gcc: $(gcc_d_common_objs) $(gcc_d_test_objs)
 	$(gcc_command) -o $@ $(GCC_DEBUG_FLAGS) $^ $(GCC_DEBUG_LINK_FLAGS)
 
-bin/test-release-gcc: $(gcc_common_objs) $(gcc_test_objs) | bin
+bin/test-release-gcc: $(gcc_common_objs) $(gcc_test_objs)
 	$(gcc_command) -o $@ $(GCC_RELEASE_FLAGS) $^ $(GCC_RELEASE_LINK_FLAGS)
 
-bin/test-debug-clang: $(clang_d_common_objs) $(clang_d_test_objs) | bin
+bin/test-debug-clang: $(clang_d_common_objs) $(clang_d_test_objs)
 	$(clang_command) -o $@ $(CLANG_DEBUG_FLAGS) $^ $(CLANG_DEBUG_LINK_FLAGS)
 
-bin/test-release-clang: $(clang_common_objs) $(clang_test_objs) | bin
+bin/test-release-clang: $(clang_common_objs) $(clang_test_objs)
 	$(clang_command) -o $@ $(CLANG_RELEASE_FLAGS) $^ $(CLANG_RELEASE_LINK_FLAGS)
 
-bin/test-debug-mingw.exe: $(mingw_d_common_objs) $(mingw_d_test_objs) | bin
+bin/test-debug-mingw.exe: $(mingw_d_common_objs) $(mingw_d_test_objs)
 	$(mingw_command) -o $@ $(MINGW_DEBUG_FLAGS) $^ $(MINGW_DEBUG_LINK_FLAGS)
 
-bin/test-release-mingw.exe: $(mingw_common_objs) $(mingw_test_objs) | bin
+bin/test-release-mingw.exe: $(mingw_common_objs) $(mingw_test_objs)
 	$(mingw_command) -o $@ $(MINGW_RELEASE_FLAGS) $^ $(MINGW_RELEASE_LINK_FLAGS)
 
-bin/test-debug-gnu-clang.exe: $(win_clang_d_common_objs) $(win_clang_d_test_objs) | bin
+bin/test-debug-gnu-clang.exe: $(win_clang_d_common_objs) $(win_clang_d_test_objs)
 	$(clang_command) -o $@ $(WIN_GNU_CLANG_DEBUG_FLAGS) $^ $(WIN_GNU_CLANG_DEBUG_LINK_FLAGS)
 
-bin/test-release-gnu-clang.exe: $(win_clang_common_objs) $(win_clang_test_objs) | bin
+bin/test-release-gnu-clang.exe: $(win_clang_common_objs) $(win_clang_test_objs)
 	$(clang_command) -o $@ $(WIN_GNU_CLANG_RELEASE_FLAGS) $^ $(WIN_GNU_CLANG_RELEASE_LINK_FLAGS)
 
 # Objects

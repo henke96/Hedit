@@ -1,8 +1,5 @@
 bin
-*.dep
-*.o
-*.obj
-*.pdb
+build
 
 .*
 !.gitkeep

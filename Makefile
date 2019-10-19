@@ -99,7 +99,7 @@ $(clang_command) \
 ]
 !ENDIF
 
-!INCLUDE buildsystem\NMakeTemp.dep
+!INCLUDE build\NMakeTemp.mk
 
-!IF [del buildsystem\NMakeTemp.dep]
+!IF [del build\NMakeTemp.mk]
 !ENDIF
