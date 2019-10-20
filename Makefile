@@ -1,42 +1,19 @@
 # NMake makefile
 !include Configuration.mk
 
+!IF $(CPP)
+clang_command = clang++
+!ELSE
+clang_command = clang
+!ENDIF
+
 temp_common_sources = $(COMMON_SOURCES) $(COMMON_WINDOWS_SOURCES)
 temp_main_sources = $(MAIN_SOURCES) $(MAIN_WINDOWS_SOURCES)
 temp_test_sources = $(TEST_SOURCES) $(TEST_WINDOWS_SOURCES)
 
-!IF $(CPP)
-win_all_common_sources = $(temp_common_sources:.cpp=.c)
-win_all_main_sources = $(temp_main_sources:.cpp=.c)
-win_all_test_sources = $(temp_test_sources:.cpp=.c)
-source_ext = cpp
-clang_command = clang++
-!ELSE
-win_all_common_sources = $(temp_common_sources)
-win_all_main_sources = $(temp_main_sources)
-win_all_test_sources = $(temp_test_sources)
-source_ext = c
-clang_command = clang
+!IF [buildsystem\NMakeHelper.bat "$(temp_common_sources:src/=)" "$(temp_main_sources:src/=)" "$(temp_test_sources:src/=)"]
 !ENDIF
-win_all_sources = $(win_all_common_sources) $(win_all_main_sources) $(win_all_test_sources)
-
-temp_common = $(win_all_common_sources:src/=build/)
-temp_main = $(win_all_main_sources:src/=build/)
-temp_test = $(win_all_test_sources:src/=build/)
-
-msvc_common_objs = $(temp_common:.c=.msvc.obj)
-msvc_main_objs = $(temp_main:.c=.msvc.obj)
-msvc_test_objs = $(temp_test:.c=.msvc.obj)
-msvc_d_common_objs = $(temp_common:.c=.msvc_d.obj)
-msvc_d_main_objs = $(temp_main:.c=.msvc_d.obj)
-msvc_d_test_objs = $(temp_test:.c=.msvc_d.obj)
-
-win_clang_common_objs = $(temp_common:.c=.win_clang.o)
-win_clang_main_objs = $(temp_main:.c=.win_clang.o)
-win_clang_test_objs = $(temp_test:.c=.win_clang.o)
-win_clang_d_common_objs = $(temp_common:.c=.win_clang_d.o)
-win_clang_d_main_objs = $(temp_main:.c=.win_clang_d.o)
-win_clang_d_test_objs = $(temp_test:.c=.win_clang_d.o)
+!INCLUDE build\NMakeHelp.mk
 
 debug: bin\debug-msvc.exe
 release: bin\release-msvc.exe
@@ -86,15 +63,3 @@ bin\test-debug-clang.exe: $(win_clang_d_common_objs) $(win_clang_d_test_objs)
 
 bin\test-release-clang.exe: $(win_clang_common_objs) $(win_clang_test_objs)
 	$(clang_command) -o $@ $(WIN_CLANG_RELEASE_FLAGS) $**  $(WIN_CLANG_RELEASE_LINK_FLAGS)
-
-# Dependencies
-temp_all = $(win_all_sources:src/=)
-all_files = $(temp_all:.c=)
-
-!IF [buildsystem\NMakeHelper.bat "$(all_files)" $(source_ext)]
-!ENDIF
-
-!INCLUDE build\NMakeTemp.mk
-
-!IF [del build\NMakeTemp.mk]
-!ENDIF
