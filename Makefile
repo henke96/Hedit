@@ -3,7 +3,7 @@
 
 temp_test_sources = $(TEST_SOURCES) $(TEST_WINDOWS_SOURCES)
 
-!IF [buildsystem\NMakeHelper.bat "$(COMMON_SOURCES) $(COMMON_WINDOWS_SOURCES)" "$(MAIN_SOURCES) $(MAIN_WINDOWS_SOURCES)" ""]
+!IF [buildsystem\NMakeHelper.bat "$(COMMON_SOURCES) $(COMMON_WINDOWS_SOURCES)" "$(MAIN_SOURCES) $(MAIN_WINDOWS_SOURCES)" "$(temp_test_sources)"]
 !ENDIF
 !INCLUDE build\NMakeHelp.mk
 
