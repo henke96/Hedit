@@ -1,6 +1,3 @@
-# Language? C (0) or C++ (1)
-CPP = 0
-
 # Common sources
 COMMON_SOURCES =\
 src/main/buffer.c\
@@ -68,3 +65,9 @@ WIN_CLANG_RELEASE_LINK_FLAGS =
 
 MSVC_DEBUG_LINK_FLAGS =
 MSVC_RELEASE_LINK_FLAGS =
+
+# Compiler commands
+GCC_COMMAND = gcc
+CLANG_COMMAND = clang
+MINGW_COMMAND = x86_64-w64-mingw32-gcc
+MSVC_COMMAND = cl
