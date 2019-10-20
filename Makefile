@@ -1,11 +1,7 @@
 # NMake makefile
 !include Configuration.mk
 
-temp_common_sources = $(COMMON_SOURCES) $(COMMON_WINDOWS_SOURCES)
-temp_main_sources = $(MAIN_SOURCES) $(MAIN_WINDOWS_SOURCES)
-temp_test_sources = $(TEST_SOURCES) $(TEST_WINDOWS_SOURCES)
-
-!IF [buildsystem\NMakeHelper.bat "$(temp_common_sources:src/=)" "$(temp_main_sources:src/=)" "$(temp_test_sources:src/=)"]
+!IF [buildsystem\NMakeHelper.bat "$(COMMON_SOURCES) $(COMMON_WINDOWS_SOURCES)" "$(MAIN_SOURCES) $(MAIN_WINDOWS_SOURCES)" "$(TEST_SOURCES) $(TEST_WINDOWS_SOURCES)"]
 !ENDIF
 !INCLUDE build\NMakeHelp.mk
 

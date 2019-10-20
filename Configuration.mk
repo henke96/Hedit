@@ -1,25 +1,25 @@
 # Common sources
 COMMON_SOURCES =\
-src/main/buffer.c\
-src/main/file/fileWriter.c
+main/buffer.c\
+main/file/fileWriter.c
 
 COMMON_WINDOWS_SOURCES =\
-src/main/file/windows/fileMapping.c
+main/file/windows/fileMapping.c
 
 COMMON_LINUX_SOURCES =\
-src/main/file/linux/fileMapping.c
+main/file/linux/fileMapping.c
 
 # Main sources
 MAIN_SOURCES =\
-src/main/main.c
+main/main.c
 
 MAIN_WINDOWS_SOURCES =
 MAIN_LINUX_SOURCES =
 
 # Test sources
 TEST_SOURCES =\
-src/test/test.c\
-src/test/buffer_test.c
+test/test.c\
+test/buffer_test.c
 
 TEST_WINDOWS_SOURCES =
 TEST_LINUX_SOURCES =
