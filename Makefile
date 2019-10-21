@@ -1,12 +1,11 @@
 # NMake makefile
-!CMDSWITCHES +S
 !include Configuration.mk
 
 temp_test_sources = $(TEST_SOURCES) $(TEST_WINDOWS_SOURCES)
 
 build\NMakeHelp.mk: Configuration.mk
     buildsystem\NMakeHelper.bat "$(COMMON_SOURCES) $(COMMON_WINDOWS_SOURCES)" "$(MAIN_SOURCES) $(MAIN_WINDOWS_SOURCES)" "$(temp_test_sources)"
-
+!CMDSWITCHES +S
 debug: build\NMakeHelp.mk
     $(MAKE) /F buildsystem\Makefile /NOLOGO bin\debug-msvc.exe
 release: build\NMakeHelp.mk
