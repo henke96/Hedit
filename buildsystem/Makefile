@@ -1,5 +1,5 @@
 !include Configuration.mk
-
+.SUFFIXES :
 !INCLUDE build\NMakeHelp.mk
 
 # Main binaries
@@ -27,3 +27,7 @@ bin\test-debug-clang.exe: $(win_clang_d_common_objs) $(win_clang_d_test_objs)
 
 bin\test-release-clang.exe: $(win_clang_common_objs) $(win_clang_test_objs)
     $(CLANG_COMMAND) -o $@ $(WIN_CLANG_RELEASE_FLAGS) $**  $(WIN_CLANG_RELEASE_LINK_FLAGS)
+
+# Assembly (not used for building)
+asm: $(msvc_asm)
+asm-clang: $(win_clang_asm)

@@ -11,6 +11,7 @@ win_all_test_sources = $(TEST_SOURCES) $(TEST_WINDOWS_SOURCES)
 win_all_sources = $(win_all_common_sources) $(win_all_main_sources) $(win_all_test_sources)
 
 gcc_deps = $(all_sources:%=build/%.gcc.dep)
+gcc_asm = $(win_all_sources:%=build/%.gcc.asm)
 gcc_common_objs = $(all_common_sources:%=build/%.gcc.o)
 gcc_main_objs = $(all_main_sources:%=build/%.gcc.o)
 gcc_test_objs = $(all_test_sources:%=build/%.gcc.o)
@@ -20,6 +21,7 @@ gcc_d_main_objs = $(all_main_sources:%=build/%.gcc_d.o)
 gcc_d_test_objs = $(all_test_sources:%=build/%.gcc_d.o)
 
 clang_deps = $(all_sources:%=build/%.clang.dep)
+clang_asm = $(win_all_sources:%=build/%.clang.asm)
 clang_common_objs = $(all_common_sources:%=build/%.clang.o)
 clang_main_objs = $(all_main_sources:%=build/%.clang.o)
 clang_test_objs = $(all_test_sources:%=build/%.clang.o)
@@ -29,6 +31,7 @@ clang_d_main_objs = $(all_main_sources:%=build/%.clang_d.o)
 clang_d_test_objs = $(all_test_sources:%=build/%.clang_d.o)
 
 mingw_deps = $(win_all_sources:%=build/%.mingw.dep)
+mingw_asm = $(win_all_sources:%=build/%.mingw.asm)
 mingw_common_objs = $(win_all_common_sources:%=build/%.mingw.o)
 mingw_main_objs = $(win_all_main_sources:%=build/%.mingw.o)
 mingw_test_objs = $(win_all_test_sources:%=build/%.mingw.o)
@@ -38,6 +41,7 @@ mingw_d_main_objs = $(win_all_main_sources:%=build/%.mingw_d.o)
 mingw_d_test_objs = $(win_all_test_sources:%=build/%.mingw_d.o)
 
 win_clang_deps = $(win_all_sources:%=build/%.win_gnu_clang.dep)
+win_clang_asm = $(win_all_sources:%=build/%.win_gnu_clang.asm)
 win_clang_common_objs = $(win_all_common_sources:%=build/%.win_gnu_clang.o)
 win_clang_main_objs = $(win_all_main_sources:%=build/%.win_gnu_clang.o)
 win_clang_test_objs = $(win_all_test_sources:%=build/%.win_gnu_clang.o)
@@ -99,6 +103,11 @@ clean:
 	rm -rf build
 endif
 
+asm: $(gcc_asm)
+asm-clang: $(clang_asm)
+win-asm: $(mingw_asm)
+win-asm-clang: $(win_clang_asm)
+
 # Main binaries
 bin/debug-gcc: $(gcc_d_common_objs) $(gcc_d_main_objs)
 	$(GCC_COMMAND) -o $@ $(GCC_DEBUG_FLAGS) $^ $(GCC_DEBUG_LINK_FLAGS)
@@ -149,6 +158,19 @@ bin/test-debug-gnu-clang.exe: $(win_clang_d_common_objs) $(win_clang_d_test_objs
 bin/test-release-gnu-clang.exe: $(win_clang_common_objs) $(win_clang_test_objs)
 	$(CLANG_COMMAND) -o $@ $(WIN_GNU_CLANG_RELEASE_FLAGS) $^ $(WIN_GNU_CLANG_RELEASE_LINK_FLAGS)
 
+# Assembly (not used for building)
+build/%.gcc.asm: build/%.gcc.dep
+	$(MINGW_COMMAND) -o $@ -S -masm=intel -fverbose-asm $(GCC_RELEASE_FLAGS) src/$*
+
+build/%.clang.asm: build/%.clang.dep
+	$(CLANG_COMMAND) -o $@ -S -masm=intel -fverbose-asm $(CLANG_RELEASE_FLAGS) src/$*
+
+build/%.mingw.asm: build/%.mingw.dep
+	$(MINGW_COMMAND) -o $@ -S -masm=intel -fverbose-asm $(MINGW_RELEASE_FLAGS) src/$*
+
+build/%.win_gnu_clang.asm: build/%.win_gnu_clang.dep
+	$(CLANG_COMMAND) -o $@ -S -masm=intel -fverbose-asm $(WIN_GNU_CLANG_RELEASE_FLAGS) src/$*
+
 # Objects
 build/%.gcc_d.o: build/%.gcc_d.dep
 	$(GCC_COMMAND) -o $@ -c $(GCC_DEBUG_FLAGS) src/$*
@@ -179,25 +201,25 @@ build/%.gcc_d.dep: src/% Configuration.mk
 	$(GCC_COMMAND) -c -MM -MP -MF $@ -MT build/$*.gcc_d.o $(GCC_DEBUG_FLAGS) src/$*
 
 build/%.gcc.dep: src/% Configuration.mk
-	$(GCC_COMMAND) -c -MM -MP -MF $@ -MT build/$*.gcc.o $(GCC_RELEASE_FLAGS) src/$*
+	$(GCC_COMMAND) -c -MM -MP -MF $@ -MT "build/$*.gcc.o build/$*.gcc.asm" $(GCC_RELEASE_FLAGS) src/$*
 
 build/%.clang_d.dep: src/% Configuration.mk
 	$(CLANG_COMMAND) -c -MM -MP -MF $@ -MT build/$*.clang_d.o $(CLANG_DEBUG_FLAGS) src/$*
 
 build/%.clang.dep: src/% Configuration.mk
-	$(CLANG_COMMAND) -c -MM -MP -MF $@ -MT build/$*.clang.o $(CLANG_RELEASE_FLAGS) src/$*
+	$(CLANG_COMMAND) -c -MM -MP -MF $@ -MT "build/$*.clang.o build/$*.clang.asm" $(CLANG_RELEASE_FLAGS) src/$*
 
 build/%.mingw_d.dep: src/% Configuration.mk
 	$(MINGW_COMMAND) -c -MM -MP -MF $@ -MT build/$*.mingw_d.o $(MINGW_DEBUG_FLAGS) src/$*
 
 build/%.mingw.dep: src/% Configuration.mk
-	$(MINGW_COMMAND) -c -MM -MP -MF $@ -MT build/$*.mingw.o $(MINGW_RELEASE_FLAGS) src/$*
+	$(MINGW_COMMAND) -c -MM -MP -MF $@ -MT "build/$*.mingw.o build/$*.mingw.asm" $(MINGW_RELEASE_FLAGS) src/$*
 
 build/%.win_gnu_clang_d.dep: src/% Configuration.mk
 	$(CLANG_COMMAND) -c -MM -MP -MF $@ -MT build/$*.win_gnu_clang_d.o $(WIN_GNU_CLANG_DEBUG_FLAGS) src/$*
 
 build/%.win_gnu_clang.dep: src/% Configuration.mk
-	$(CLANG_COMMAND) -c -MM -MP -MF $@ -MT build/$*.win_gnu_clang.o $(WIN_GNU_CLANG_RELEASE_FLAGS) src/$*
+	$(CLANG_COMMAND) -c -MM -MP -MF $@ -MT "build/$*.win_gnu_clang.o build/$*.win_gnu_clang.asm" $(WIN_GNU_CLANG_RELEASE_FLAGS) src/$*
 
 $(gcc_d_deps):
 $(gcc_deps):
@@ -209,13 +231,13 @@ $(win_clang_d_deps):
 $(win_clang_deps):
 
 include_gcc_d_deps = debug test-debug all
-include_gcc_deps = release test-release all
+include_gcc_deps = release test-release all asm
 include_clang_d_deps = debug-clang test-debug-clang all-clang
-include_clang_deps = release-clang test-release-clang all-clang
+include_clang_deps = release-clang test-release-clang all-clang asm-clang
 include_mingw_d_deps = win-debug win-test-debug win-all
-include_mingw_deps = win-release win-test-release win-all
+include_mingw_deps = win-release win-test-release win-all win-asm
 include_win_clang_d_deps = win-debug-clang win-test-debug-clang win-all-clang
-include_win_clang_deps = win-release-clang win-test-release-clang win-all-clang
+include_win_clang_deps = win-release-clang win-test-release-clang win-all-clang win-asm-clang
 
 ifneq ($(filter $(MAKECMDGOALS),$(include_gcc_d_deps)),)
 include $(wildcard $(gcc_d_deps))

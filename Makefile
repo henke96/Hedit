@@ -35,6 +35,11 @@ all: build\NMakeHelp.mk
     $(MAKE) /F buildsystem\Makefile /NOLOGO bin\debug-msvc.exe bin\release-msvc.exe $(test_targets)
 all-clang: build\NMakeHelp.mk
     $(MAKE) /F buildsystem\Makefile /NOLOGO bin\debug-clang.exe bin\release-clang.exe $(test_clang_targets)
+
+asm: build\NMakeHelp.mk
+    $(MAKE) /F buildsystem\Makefile /NOLOGO asm
+asm-clang: build\NMakeHelp.mk
+    $(MAKE) /F buildsystem\Makefile /NOLOGO asm-clang
 !CMDSWITCHES -S
 
 clean:
