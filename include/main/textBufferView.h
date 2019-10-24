@@ -18,7 +18,7 @@ struct textBufferView {
 };
 
 void textBufferView_init(struct textBufferView *self, const char *text, int64_t textLength);
-void textBufferView_deinit(struct textBufferView *self);
+static inline void textBufferView_deinit(struct textBufferView *self) {}
 static inline struct bufferView *textBufferView_getBufferView(const struct textBufferView *self) {
     return &self->bufferView;
 }

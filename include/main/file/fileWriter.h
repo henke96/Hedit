@@ -15,6 +15,8 @@ struct fileWriter {
 static inline void fileWriter_init(struct fileWriter *self, const char *path) {
     self->path = path;
 }
+static inline void fileWriter_deinit(struct fileWriter *self) {}
+
 int fileWriter_open(struct fileWriter *self);
 int fileWriter_append(const struct fileWriter *self, const char *data, int64_t length);
 int fileWriter_close(const struct fileWriter *self);
