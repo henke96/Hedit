@@ -1,3 +1,7 @@
 @echo off
-rmdir /S /Q bin
-rmdir /S /Q build
+if exist bin\ (
+    rmdir /S /Q bin
+)
+if exist build\ (
+    rmdir /S /Q build
+)
