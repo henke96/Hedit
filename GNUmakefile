@@ -84,7 +84,7 @@ build/%.gcc_d.o: build/%.gcc_d.dep
 	$(GCC_COMMAND) -o $@ -c $(GCC_DEBUG_FLAGS) src/$*
 build/%.gcc_d.dep: src/% Configuration.mk
 	$(GCC_COMMAND) -c -MM -MP -MF $@ -MT build/$*.gcc_d.o $(GCC_DEBUG_FLAGS) src/$*
-$(gcc_d_deps)
+$(gcc_d_deps):
 include $(wildcard $(gcc_d_deps))
 endif
 
