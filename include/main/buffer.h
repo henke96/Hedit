@@ -51,8 +51,10 @@ static inline void buffer_moveCursorTo(struct buffer *self, struct buffer_cursor
 
 static inline char buffer_getAtCursor(const struct buffer *self, struct buffer_cursor *cursor) {
     if (cursor->offset < 0) {
+        assert(-cursor->offset <= self->modifications[cursor->prevModificationIndex].insertLength);
         return self->modifications[cursor->prevModificationIndex].insertEnd[cursor->offset];
     } else {
+        assert(self->textLength > cursor->offset);
         return self->text[cursor->offset];
     }
 }

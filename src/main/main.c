@@ -225,23 +225,29 @@ void test2(void) {
 
 void simple(void) {
     struct fileMapping fileMapping;
-    if (fileMapping_init(&fileMapping, ".out.txt") < 0) {
+    if (fileMapping_init(&fileMapping, "Configuration.mk") < 0) {
         return;
     }
 
     struct buffer buffer;
     buffer_init(&buffer, fileMapping_getContent(&fileMapping), fileMapping_getContentSize(&fileMapping));
 
-    struct buffer_cursor startOfLineCursor;
-    buffer_cursor_init(&startOfLineCursor, &buffer);
-    buffer_registerCursor(&buffer, &startOfLineCursor);
+    struct buffer_cursor lineCursor;
+    buffer_cursor_init(&lineCursor, &buffer);
+    buffer_registerCursor(&buffer, &lineCursor);
 
     while (1) {
         struct buffer_cursor cursorCopy;
-        buffer_cursor_init_copy(&cursorCopy, &startOfLineCursor);
 
         // Print a line.
-        while (buffer_cursor_getOffset(&cursorCopy) != buffer_getLength(&buffer)) {
+        if (buffer_cursor_getOffset(&lineCursor) == buffer_getLength(&buffer)) goto skipPrintLine;
+
+        if (buffer_getAtCursor(&buffer, &lineCursor) == 10) {
+            buffer_moveCursor(&buffer, &lineCursor, 1);
+        } else if (buffer_cursor_getOffset(&lineCursor) != 0) goto skipPrintLine;
+
+        buffer_cursor_init_copy(&cursorCopy, &lineCursor);
+        while (1) {
             struct bufferChunk chunk = buffer_getCursorChunk(&buffer, &cursorCopy);
             assert(bufferChunk_getLength(&chunk) > 0);
 
@@ -249,27 +255,23 @@ void simple(void) {
             int64_t chunkLength = bufferChunk_getLength(&chunk);
             int64_t chunkCursorOffset = bufferChunk_getCursorOffset(&chunk);
             for (int64_t i = chunkCursorOffset; i < chunkLength; ++i) {
-                if (chunkText[i] == 13) {
-                    buffer_moveCursor(&buffer, &cursorCopy, i + 1 - chunkCursorOffset);
-                    if (buffer_getAtCursor(&buffer, &cursorCopy) == 10) {
-                        buffer_moveCursor(&buffer, &cursorCopy, 1);
-                    }
-                } else if (chunkText[i] == 10) {
-                    buffer_moveCursor(&buffer, &cursorCopy, i + 1 - chunkCursorOffset);
-                } else continue;
+                if (chunkText[i] != 10) continue;
 
-                printf("%.*s", (int)(i - chunkCursorOffset), &chunkText[chunkCursorOffset]);
+                buffer_moveCursor(&buffer, &cursorCopy, i - chunkCursorOffset);
+                printf("%d:%.*s", (int)(buffer_cursor_getOffset(&lineCursor)), (int)(i - chunkCursorOffset), &chunkText[chunkCursorOffset]);
                 goto foundLineEnd;
             }
             // Line end not in chunk.
-            printf("%.*s", (int)(chunkLength - chunkCursorOffset), &chunkText[chunkCursorOffset]);
+            printf("%d:%.*s", (int)(buffer_cursor_getOffset(&lineCursor)), (int)(chunkLength - chunkCursorOffset), &chunkText[chunkCursorOffset]);
             buffer_moveCursor(&buffer, &cursorCopy, (chunkLength - chunkCursorOffset));
+            if (buffer_cursor_getOffset(&cursorCopy) == buffer_getLength(&buffer)) break;
         }
         foundLineEnd:
-        buffer_cursor_deinit(&startOfLineCursor);
-        buffer_cursor_init_copy(&startOfLineCursor, &cursorCopy);
+        buffer_cursor_deinit(&lineCursor);
+        buffer_cursor_init_copy(&lineCursor, &cursorCopy);
         buffer_cursor_deinit(&cursorCopy);
 
+        skipPrintLine:
         while (getchar() != 10);
     }
 }
