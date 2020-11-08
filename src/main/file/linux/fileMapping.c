@@ -7,7 +7,7 @@
 #include <unistd.h>
 #include <sys/mman.h>
 
-int fileMapping_init(struct fileMapping *self, const char *path) {
+static int fileMapping_init(struct fileMapping *self, const char *path) {
     self->fd = open(path, O_RDONLY);
     if (self->fd < 0) goto cleanup_0;
 
@@ -26,7 +26,7 @@ int fileMapping_init(struct fileMapping *self, const char *path) {
     return fileMapping_init_FILE_READING_ERROR;
 }
 
-void fileMapping_deinit(struct fileMapping *self) {
+static void fileMapping_deinit(struct fileMapping *self) {
     munmap(self->content, self->contentSize);
     close(self->fd);
 }

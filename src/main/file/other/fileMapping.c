@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-int fileMapping_init(struct fileMapping *self, const char *path) {
+static int fileMapping_init(struct fileMapping *self, const char *path) {
     FILE *handle = fopen(path, "rb");
     if (handle == NULL) return fileMapping_init_FILE_READING_ERROR;
 
@@ -26,6 +26,6 @@ int fileMapping_init(struct fileMapping *self, const char *path) {
     return 0;
 }
 
-void fileMapping_deinit(struct fileMapping *self) {
+static void fileMapping_deinit(struct fileMapping *self) {
     free(self->content);
 }

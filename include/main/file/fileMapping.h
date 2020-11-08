@@ -22,8 +22,8 @@ struct fileMapping {
 #endif
 };
 
-int fileMapping_init(struct fileMapping *self, const char *path);
-void fileMapping_deinit(struct fileMapping *self);
+static int fileMapping_init(struct fileMapping *self, const char *path);
+static void fileMapping_deinit(struct fileMapping *self);
 
 static inline char *fileMapping_getContent(const struct fileMapping *self) {
     return self->content;

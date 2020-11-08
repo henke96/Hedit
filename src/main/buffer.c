@@ -40,7 +40,7 @@ static void buffer_modification_deinit(struct buffer_modification *self) {
     }
 }
 
-static int insertModificationAt(struct buffer *self, int32_t index) {
+static int buffer_insertModificationAt(struct buffer *self, int32_t index) {
     assert(index >= 0);
     struct buffer_modification *modifications = realloc(self->modifications, sizeof(modifications[0]) * (self->numModifications + 1));
     if (!modifications) return -1;
@@ -52,7 +52,7 @@ static int insertModificationAt(struct buffer *self, int32_t index) {
     return 0;
 }
 
-static void deleteModificationAt(struct buffer *self, int32_t index) {
+static void buffer_deleteModificationAt(struct buffer *self, int32_t index) {
     if (self->numModifications > 1) {
         memmove(self->modifications + index, self->modifications + (index + 1), sizeof(self->modifications[0]) * (self->numModifications - (index + 1)));
 
@@ -67,7 +67,7 @@ static void deleteModificationAt(struct buffer *self, int32_t index) {
     --self->numModifications;
 }
 
-static void deleteModificationProperly(struct buffer *self, int32_t index) {
+static void buffer_deleteModificationProperly(struct buffer *self, int32_t index) {
     // Correct prevModificationIndex for all cursors.
     for (int32_t i = 0; i < self->registeredCursorsCapacity; ++i) {
         struct buffer_cursor *cursor = self->registeredCursors[i];
@@ -80,10 +80,10 @@ static void deleteModificationProperly(struct buffer *self, int32_t index) {
     }
 
     buffer_modification_deinit(&self->modifications[index]);
-    deleteModificationAt(self, index);
+    buffer_deleteModificationAt(self, index);
 }
 
-static int insertIntoModification(struct buffer *self, int32_t index, int64_t cursorOffset, const char *str, int64_t strLength) {
+static int buffer_insertIntoModification(struct buffer *self, int32_t index, int64_t cursorOffset, const char *str, int64_t strLength) {
     assert(strLength >= 0);
     assert(index >= 0 && index < self->numModifications);
 
@@ -124,7 +124,7 @@ static int insertIntoModification(struct buffer *self, int32_t index, int64_t cu
             modification->intervalStart == modification->intervalEnd
         ) {
             // The insertion optimization must've reduced the interval to be empty.
-            deleteModificationProperly(self, index);
+            buffer_deleteModificationProperly(self, index);
         }
         return 0;
     }
@@ -167,7 +167,7 @@ static int insertIntoModification(struct buffer *self, int32_t index, int64_t cu
     return 0;
 }
 
-static void deleteFromModification(struct buffer *self, int32_t index, int64_t cursorOffset, int64_t deleteLength) {
+static void buffer_deleteFromModification(struct buffer *self, int32_t index, int64_t cursorOffset, int64_t deleteLength) {
     assert(deleteLength > 0);
     assert(cursorOffset < 0);
 
@@ -198,7 +198,7 @@ static void deleteFromModification(struct buffer *self, int32_t index, int64_t c
 
         if (modification->intervalEnd - modification->intervalStart == 0) {
             // This modification doesn't remove or insert any text. Delete it.
-            deleteModificationProperly(self, index);
+            buffer_deleteModificationProperly(self, index);
         } else {
             // It removes text, but doesn't insert any.
             free(oldInsert);
@@ -248,7 +248,7 @@ static void deleteFromModification(struct buffer *self, int32_t index, int64_t c
     }
 }
 
-void buffer_init(struct buffer *self, const char *text, int64_t textLength) {
+static void buffer_init(struct buffer *self, const char *text, int64_t textLength) {
     assert(textLength >= 0);
     self->text = text;
     self->textLength = textLength;
@@ -259,14 +259,14 @@ void buffer_init(struct buffer *self, const char *text, int64_t textLength) {
     self->registeredCursors = NULL;
 }
 
-void buffer_deinit(struct buffer *self) {
+static void buffer_deinit(struct buffer *self) {
     for (int32_t i = 0; i < self->numModifications; ++i) {
         buffer_modification_deinit(&self->modifications[i]);
     }
     free(self->modifications);
 }
 
-int buffer_registerCursor(struct buffer *self, struct buffer_cursor *cursor) {
+static int buffer_registerCursor(struct buffer *self, struct buffer_cursor *cursor) {
     for (int32_t i = 0; i < self->registeredCursorsCapacity; ++i) {
         if (self->registeredCursors[i] == NULL) {
             self->registeredCursors[i] = cursor;
@@ -285,7 +285,7 @@ int buffer_registerCursor(struct buffer *self, struct buffer_cursor *cursor) {
     return 0;
 }
 
-void buffer_unregisterCursor(struct buffer *self, struct buffer_cursor *cursor) {
+static void buffer_unregisterCursor(struct buffer *self, struct buffer_cursor *cursor) {
     for (int32_t i = 0; i < self->registeredCursorsCapacity; ++i) {
         if (self->registeredCursors[i] == cursor) {
             self->registeredCursors[i] = NULL;
@@ -321,7 +321,7 @@ struct bufferChunk buffer_getCursorChunk(const struct buffer *self, const struct
     return chunk;
 }
 
-void buffer_moveCursor(const struct buffer *self, struct buffer_cursor *cursor, int64_t offset) {
+static void buffer_moveCursor(const struct buffer *self, struct buffer_cursor *cursor, int64_t offset) {
     cursor->bufferOffset += offset;
     assert(cursor->bufferOffset >= 0 && cursor->bufferOffset <= self->bufferLength);
 
@@ -377,11 +377,11 @@ void buffer_moveCursor(const struct buffer *self, struct buffer_cursor *cursor, 
     cursor->offset = cursorOffset;
 }
 
-int buffer_insertAtCursor(struct buffer *self, const struct buffer_cursor *cursor, const char *str, int64_t strLength) {
+static int buffer_insertAtCursor(struct buffer *self, const struct buffer_cursor *cursor, const char *str, int64_t strLength) {
     assert(strLength > 0);
     if (cursor->offset < 0) {
         // Insert into current modification.
-        if (insertIntoModification(self, cursor->prevModificationIndex, cursor->offset, str, strLength) < 0) {
+        if (buffer_insertIntoModification(self, cursor->prevModificationIndex, cursor->offset, str, strLength) < 0) {
             return buffer_MEMORY_ALLOCATION_ERROR;
         }
     } else if (
@@ -389,18 +389,18 @@ int buffer_insertAtCursor(struct buffer *self, const struct buffer_cursor *curso
         cursor->offset == self->modifications[cursor->prevModificationIndex].intervalEnd
     ) {
         // Can append to previous modification.
-        if (insertIntoModification(self, cursor->prevModificationIndex, 0, str, strLength) < 0) {
+        if (buffer_insertIntoModification(self, cursor->prevModificationIndex, 0, str, strLength) < 0) {
             return buffer_MEMORY_ALLOCATION_ERROR;
         }
     } else {
         // Create a new modification.
         int32_t newModificationIndex = cursor->prevModificationIndex + 1;
-        if (insertModificationAt(self, newModificationIndex) < 0) {
+        if (buffer_insertModificationAt(self, newModificationIndex) < 0) {
             return buffer_MEMORY_ALLOCATION_ERROR;
         }
 
         if (buffer_modification_init(&self->modifications[newModificationIndex], cursor->offset, 0, strLength, str) < 0) {
-            deleteModificationAt(self, newModificationIndex);
+            buffer_deleteModificationAt(self, newModificationIndex);
             return buffer_MEMORY_ALLOCATION_ERROR;
         }
 
@@ -431,7 +431,7 @@ int buffer_insertAtCursor(struct buffer *self, const struct buffer_cursor *curso
     return 0;
 }
 
-int buffer_deleteAtCursor(struct buffer *self, const struct buffer_cursor *cursor, int64_t length) {
+static int buffer_deleteAtCursor(struct buffer *self, const struct buffer_cursor *cursor, int64_t length) {
     int64_t deletedLength = 0;
     while (deletedLength < length) {
         int64_t remaining = length - deletedLength;
@@ -440,7 +440,7 @@ int buffer_deleteAtCursor(struct buffer *self, const struct buffer_cursor *curso
             int64_t shortest = -cursor->offset;
             if (remaining < shortest) shortest = remaining;
 
-            deleteFromModification(self, cursor->prevModificationIndex, cursor->offset, shortest);
+            buffer_deleteFromModification(self, cursor->prevModificationIndex, cursor->offset, shortest);
             deletedLength += shortest;
         } else {
             // Outside any modification.
@@ -504,11 +504,11 @@ int buffer_deleteAtCursor(struct buffer *self, const struct buffer_cursor *curso
             }
             // Couldn't merge into prev either, so create new modification.
             int32_t newModificationIndex = cursor->prevModificationIndex + 1;
-            if (insertModificationAt(self, newModificationIndex) < 0) {
+            if (buffer_insertModificationAt(self, newModificationIndex) < 0) {
                 return buffer_MEMORY_ALLOCATION_ERROR;
             }
             if (buffer_modification_init(&self->modifications[newModificationIndex], cursor->offset, remaining, 0, NULL) < 0) {
-                deleteModificationAt(self, newModificationIndex);
+                buffer_deleteModificationAt(self, newModificationIndex);
                 return buffer_MEMORY_ALLOCATION_ERROR;
             }
 
@@ -549,7 +549,7 @@ int buffer_deleteAtCursor(struct buffer *self, const struct buffer_cursor *curso
     return 0;
 }
 
-void buffer_cursor_init(struct buffer_cursor *self, const struct buffer *buffer) {
+static void buffer_cursor_init(struct buffer_cursor *self, const struct buffer *buffer) {
     self->bufferOffset = 0;
     self->offset = 0;
     self->prevModificationIndex = -1;

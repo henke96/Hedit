@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-void printBuffer(struct buffer *buffer, struct buffer_cursor *cursor) {
+static void main_printBuffer(struct buffer *buffer, struct buffer_cursor *cursor) {
     struct buffer_cursor cursorCopy;
     buffer_cursor_init_copy(&cursorCopy, cursor);
 
@@ -23,7 +23,7 @@ void printBuffer(struct buffer *buffer, struct buffer_cursor *cursor) {
     printf("\n");
 }
 
-void printBufferData(struct buffer *buffer) {
+static void main_printBufferData(struct buffer *buffer) {
     printf("Printing buffer data:\n\tLen: %" PRId64 ", Orig len: %" PRId64 ", Num modifications: %" PRId32 "\n\tText:\n", buffer->bufferLength, buffer->textLength, buffer->numModifications);
     int32_t nextModificationIndex = 0;
     int64_t textOffset = 0;
@@ -56,7 +56,7 @@ void printBufferData(struct buffer *buffer) {
     }
 }
 
-int writeBufferToFile(const struct buffer *buffer, const char *path) {
+static int main_writeBufferToFile(const struct buffer *buffer, const char *path) {
     struct fileWriter fileWriter;
     fileWriter_init(&fileWriter, path);
     if (fileWriter_open(&fileWriter) < 0) {
@@ -84,7 +84,7 @@ int writeBufferToFile(const struct buffer *buffer, const char *path) {
     return 0;
 }
 
-void test2(void) {
+static void main_test2(void) {
     struct fileMapping fileMapping;
     if (fileMapping_init(&fileMapping, "test.txt") < 0) {
         return;
@@ -103,118 +103,118 @@ void test2(void) {
     buffer_registerCursor(&buffer, &printCursor);
 
 
-    printBuffer(&buffer, &printCursor);
+    main_printBuffer(&buffer, &printCursor);
 
     buffer_deleteAtCursor(&buffer, &cursor, 3);
     buffer_moveCursorTo(&buffer, &cursor, 0);
-    printBuffer(&buffer, &printCursor);
+    main_printBuffer(&buffer, &printCursor);
 
-    printBufferData(&buffer);
+    main_printBufferData(&buffer);
 
     buffer_insertAtCursor(&buffer, &cursor, "Hel", 3);
     buffer_moveCursorTo(&buffer, &cursor, 0);
     buffer_moveCursorTo(&buffer, &printCursor, 0);
-    printBuffer(&buffer, &printCursor);
+    main_printBuffer(&buffer, &printCursor);
 
-    printBufferData(&buffer);
+    main_printBufferData(&buffer);
 
     // Start
 
     buffer_insertAtCursor(&buffer, &cursor, "h", 1);
     buffer_moveCursorTo(&buffer, &cursor, 0);
     buffer_moveCursorTo(&buffer, &printCursor, 0);
-    printBuffer(&buffer, &printCursor);
+    main_printBuffer(&buffer, &printCursor);
 
     buffer_insertAtCursor(&buffer, &cursor, "hej ", 4);
     buffer_moveCursorTo(&buffer, &cursor, 0);
     buffer_moveCursorTo(&buffer, &printCursor, 0);
-    printBuffer(&buffer, &printCursor);
+    main_printBuffer(&buffer, &printCursor);
 
     buffer_moveCursor(&buffer, &cursor, 5);
     buffer_insertAtCursor(&buffer, &cursor, " x ", 3);
     buffer_moveCursor(&buffer, &cursor, -8);
-    printBuffer(&buffer, &printCursor);
+    main_printBuffer(&buffer, &printCursor);
 
     buffer_moveCursor(&buffer, &cursor, 13);
     buffer_insertAtCursor(&buffer, &cursor, " humble", 7);
     buffer_moveCursor(&buffer, &cursor, -20);
-    printBuffer(&buffer, &printCursor);
+    main_printBuffer(&buffer, &printCursor);
 
     buffer_moveCursor(&buffer, &cursor, 26);
     buffer_insertAtCursor(&buffer, &cursor, "!", 1);
     buffer_moveCursor(&buffer, &cursor, -27);
-    printBuffer(&buffer, &printCursor);
+    main_printBuffer(&buffer, &printCursor);
 
     buffer_moveCursor(&buffer, &cursor, 28);
     buffer_insertAtCursor(&buffer, &cursor, " wooo", 5);
     buffer_moveCursorTo(&buffer, &cursor, 0);
-    printBuffer(&buffer, &printCursor);
+    main_printBuffer(&buffer, &printCursor);
 
     buffer_moveCursorTo(&buffer, &cursor, 15);
     buffer_insertAtCursor(&buffer, &cursor, "s", 1);
     buffer_moveCursor(&buffer, &cursor, -16);
-    printBuffer(&buffer, &printCursor);
+    main_printBuffer(&buffer, &printCursor);
 
     buffer_moveCursorTo(&buffer, &cursor, 15);
     buffer_deleteAtCursor(&buffer, &cursor, 19);
     buffer_moveCursorTo(&buffer, &cursor, 0);
-    printBuffer(&buffer, &printCursor);
+    main_printBuffer(&buffer, &printCursor);
 
     buffer_moveCursorTo(&buffer, &cursor, 1);
     buffer_deleteAtCursor(&buffer, &cursor, 8);
     buffer_moveCursorTo(&buffer, &cursor, 0);
-    printBuffer(&buffer, &printCursor);
+    main_printBuffer(&buffer, &printCursor);
 
-    printBufferData(&buffer);
+    main_printBufferData(&buffer);
     // Start undoing
 
     buffer_moveCursorTo(&buffer, &cursor, 1);
     buffer_insertAtCursor(&buffer, &cursor, "ej h x H", 8);
     buffer_moveCursorTo(&buffer, &cursor, 0);
-    printBuffer(&buffer, &printCursor);
+    main_printBuffer(&buffer, &printCursor);
 
     buffer_moveCursorTo(&buffer, &cursor, 15);
     buffer_insertAtCursor(&buffer, &cursor, "sumble world!! wooo", 19);
     buffer_moveCursorTo(&buffer, &cursor, 0);
-    printBuffer(&buffer, &printCursor);
+    main_printBuffer(&buffer, &printCursor);
 
     buffer_moveCursorTo(&buffer, &cursor, 15);
     buffer_deleteAtCursor(&buffer, &cursor, 1);
     buffer_moveCursorTo(&buffer, &cursor, 0);
-    printBuffer(&buffer, &printCursor);
+    main_printBuffer(&buffer, &printCursor);
 
     buffer_moveCursorTo(&buffer, &cursor, 28);
     buffer_deleteAtCursor(&buffer, &cursor, 5);
     buffer_moveCursorTo(&buffer, &cursor, 0);
-    printBuffer(&buffer, &printCursor);
+    main_printBuffer(&buffer, &printCursor);
 
     buffer_moveCursorTo(&buffer, &cursor, 26);
     buffer_deleteAtCursor(&buffer, &cursor, 1);
     buffer_moveCursorTo(&buffer, &cursor, 0);
-    printBuffer(&buffer, &printCursor);
+    main_printBuffer(&buffer, &printCursor);
 
     buffer_moveCursorTo(&buffer, &cursor, 13);
     buffer_deleteAtCursor(&buffer, &cursor, 7);
     buffer_moveCursorTo(&buffer, &cursor, 0);
-    printBuffer(&buffer, &printCursor);
+    main_printBuffer(&buffer, &printCursor);
 
     buffer_moveCursorTo(&buffer, &cursor, 5);
     buffer_deleteAtCursor(&buffer, &cursor, 3);
     buffer_moveCursorTo(&buffer, &cursor, 0);
-    printBuffer(&buffer, &printCursor);
+    main_printBuffer(&buffer, &printCursor);
 
     buffer_deleteAtCursor(&buffer, &cursor, 4);
-    printBuffer(&buffer, &printCursor);
+    main_printBuffer(&buffer, &printCursor);
 
     buffer_deleteAtCursor(&buffer, &cursor, 1);
-    printBuffer(&buffer, &printCursor);
+    main_printBuffer(&buffer, &printCursor);
 
-    printBufferData(&buffer);
+    main_printBufferData(&buffer);
 
     buffer_unregisterCursor(&buffer, &cursor);
     buffer_unregisterCursor(&buffer, &printCursor);
 
-    writeBufferToFile(&buffer, ".out.txt");
+    main_writeBufferToFile(&buffer, ".out.txt");
 
     buffer_cursor_deinit(&cursor);
     buffer_cursor_deinit(&printCursor);
@@ -223,7 +223,7 @@ void test2(void) {
     fileMapping_deinit(&fileMapping);
 }
 
-void simple(void) {
+static void main_simple(void) {
     struct fileMapping fileMapping;
     if (fileMapping_init(&fileMapping, "Configuration.mk") < 0) {
         return;
@@ -277,7 +277,7 @@ void simple(void) {
 }
 
 int main(void) {
-    test2();
-    simple();
+    main_test2();
+    main_simple();
     return 0;
 }

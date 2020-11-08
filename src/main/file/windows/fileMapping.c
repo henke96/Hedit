@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 
-int fileMapping_init(struct fileMapping *self, const char *path) {
+static int fileMapping_init(struct fileMapping *self, const char *path) {
     self->hFile = CreateFileA(
         path,
         GENERIC_READ,
@@ -50,7 +50,7 @@ int fileMapping_init(struct fileMapping *self, const char *path) {
     return fileMapping_init_FILE_READING_ERROR;
 }
 
-void fileMapping_deinit(struct fileMapping *self) {
+static void fileMapping_deinit(struct fileMapping *self) {
     UnmapViewOfFile(self->content);
     CloseHandle(self->hFileMapping);
     CloseHandle(self->hFile);
