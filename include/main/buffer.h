@@ -64,7 +64,7 @@ static inline void buffer_cursor_init_copy(struct buffer_cursor *self, const str
 }
 
 static void buffer_cursor_init(struct buffer_cursor *self, const struct buffer *buffer);
-static inline void buffer_cursor_deinit(struct buffer_cursor *self) {}
+#define buffer_cursor_deinit(self)
 
 static inline int64_t buffer_cursor_getOffset(const struct buffer_cursor *self) {
     return self->bufferOffset;

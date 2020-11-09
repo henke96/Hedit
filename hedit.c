@@ -2,6 +2,10 @@
 #include "src/main/buffer.c"
 #include "src/main/file/fileWriter.c"
 
-#ifdef HEDIT_LINUX
+#if defined(HEDIT_PLATFORM_LINUX)
 #include "src/main/file/linux/fileMapping.c"
+#elif defined(HEDIT_PLATFORM_WINDOWS)
+#include "src/main/file/windows/fileMapping.c"
+#elif defined(HEDIT_PLATFORM_OTHER)
+#include "src/main/file/other/fileMapping.c"
 #endif

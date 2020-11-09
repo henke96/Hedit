@@ -223,11 +223,9 @@ static void main_test2(void) {
     fileMapping_deinit(&fileMapping);
 }
 
-static void main_simple(void) {
+static int main_simple(void) {
     struct fileMapping fileMapping;
-    if (fileMapping_init(&fileMapping, "Configuration.mk") < 0) {
-        return;
-    }
+    if (fileMapping_init(&fileMapping, "src/main/buffer.c") < 0) return 1;
 
     struct buffer buffer;
     buffer_init(&buffer, fileMapping_getContent(&fileMapping), fileMapping_getContentSize(&fileMapping));
@@ -274,10 +272,10 @@ static void main_simple(void) {
         skipPrintLine:
         while (getchar() != 10);
     }
+    return 0;
 }
 
 int main(void) {
     main_test2();
-    main_simple();
-    return 0;
+    return main_simple();
 }
