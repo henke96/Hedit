@@ -41,7 +41,7 @@ static int buffer_deleteAtCursor(struct buffer *self, const struct buffer_cursor
 
 static struct bufferChunk buffer_getCursorChunk(const struct buffer *self, const struct buffer_cursor *cursor);
 
-#define buffer_MOVE_CURSOR_TO(SELF, CURSOR, BUFFER_OFFSET) buffer_moveCursor(&(SELF), &(CURSOR), (BUFFER_OFFSET) - cursor.bufferOffset) 
+#define buffer_MOVE_CURSOR_TO(SELF, CURSOR, BUFFER_OFFSET) buffer_moveCursor(&(SELF), &(CURSOR), (BUFFER_OFFSET) - CURSOR.bufferOffset) 
 
 static inline char buffer_getAtCursor(const struct buffer *self, struct buffer_cursor *cursor) {
     if (cursor->offset < 0) {

@@ -10,7 +10,7 @@ static bool bufferTest_assertBufferContents(const struct buffer *buffer, const c
     
     buffer_cursor_init(&cursor, buffer);
     int64_t contentLength = strlen(content);
-    int64_t bufferLength = buffer_getLength(buffer);
+    int64_t bufferLength = buffer->length;
     if (bufferLength == contentLength) {
         for (int64_t i = 0; i < bufferLength; ++i) {
             if (buffer_getAtCursor(buffer, &cursor) != content[i]) goto fail;
@@ -26,24 +26,24 @@ static bool bufferTest_assertBufferContents(const struct buffer *buffer, const c
         content
     );
     // Print buffer contents.
-    while (buffer_cursor_getOffset(&cursor) != bufferLength) {
+    while (cursor.offset != bufferLength) {
         struct bufferChunk chunk = buffer_getCursorChunk(buffer, &cursor);
-        printf("%.*s", (int)bufferChunk_getLength(&chunk), bufferChunk_getText(&chunk));
-        buffer_moveCursor(buffer, &cursor, bufferChunk_getLength(&chunk));
+        printf("%.*s", (int)chunk.length, chunk.text);
+        buffer_moveCursor(buffer, &cursor, chunk.length);
     }
-    buffer_cursor_deinit(&cursor);
+    buffer_cursor_DEINIT(cursor);
     printf("'\n");
     return false;
 }
 
 static bool bufferTest_assertCursorOffset(const struct buffer_cursor *cursor, int64_t offset, const char *testName, int32_t testLine) {
-    if (buffer_cursor_getOffset(cursor) == offset) return true;
+    if (cursor->offset == offset) return true;
     test_printTestFail(testName, __FILE__, testLine);
     printf(
         "\tCursor offset not as expected!\n"
         "\tExpected: %" PRId64 "\n"
         "\tActual: %" PRId64 "\n",
-        offset, buffer_cursor_getOffset(cursor)
+        offset, cursor->offset
     );
     return false;
 }
@@ -71,7 +71,7 @@ static struct test_result bufferTest_simple(void) {
     if (!bufferTest_assertBufferContents(&buffer, "Hello handsome!", testName, __LINE__)) goto fail;
     if (!bufferTest_assertCursorOffset(&cursor, 14, testName, __LINE__)) goto fail;
 
-    buffer_moveCursorTo(&buffer, &cursor, 0);
+    buffer_MOVE_CURSOR_TO(buffer, cursor, 0);
     tempText = "Ahoy ";
     buffer_insertAtCursor(&buffer, &cursor, tempText, strlen(tempText));
     if (!bufferTest_assertBufferContents(&buffer, "Ahoy Hello handsome!", testName, __LINE__)) goto fail;
@@ -88,7 +88,7 @@ static struct test_result bufferTest_simple(void) {
     success = false;
 
     cleanup:
-    buffer_cursor_deinit(&cursor);
+    buffer_cursor_DEINIT(cursor);
     buffer_deinit(&buffer);
     return test_result_create(success, testName);
 }
@@ -114,7 +114,7 @@ struct test_result bufferTest_simpleMultiCursor(void) {
     for (int i = 0; i < simpleMultiCursor_NUM_CURSORS; ++i) {
         buffer_cursor_init(&cursors[i], &buffer);
         buffer_registerCursor(&buffer, &cursors[i]);
-        buffer_moveCursorTo(&buffer, &cursors[i], currentCursorOffset);
+        buffer_MOVE_CURSOR_TO(buffer, cursors[i], currentCursorOffset);
         currentCursorOffset += 13;
     }
 
@@ -196,7 +196,7 @@ struct test_result bufferTest_simpleMultiCursor(void) {
 
     cleanup:
     for (int i = 0; i < simpleMultiCursor_NUM_CURSORS; ++i) {
-        buffer_cursor_deinit(&cursors[i]);
+        buffer_cursor_DEINIT(cursors[i]);
     }
     buffer_deinit(&buffer);
     return test_result_create(success, testName);
