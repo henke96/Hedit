@@ -3,7 +3,7 @@
 static int fileWriter_open(struct fileWriter *self) {
     self->handle = fopen(self->path, "wb");
     if (self->handle == NULL) {
-        return fileWriter_init_FILE_OPEN_ERROR;
+        return fileWriter_open_FILE_OPEN_ERROR;
     }
     return 0;
 }
