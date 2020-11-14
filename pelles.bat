@@ -26,7 +26,7 @@ if "%2"=="linux" (
 )
 
 if "%3"=="debug" (
-    set "flags=%flags% /Z7"
+    set "flags=%flags% /Zi"
 ) else (
     if "%3"=="release" (
         set "flags=%flags% /DNDEBUG /O2"
