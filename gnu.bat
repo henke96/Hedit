@@ -55,7 +55,7 @@ exit /b 0
 
 :usage
 echo Usage:
-echo ./gnu.sh ^<target^> ^<platform^> ^<mode^> [compiler] [cflags]
+echo gnu.bat ^<target^> ^<platform^> ^<mode^> [compiler] [cflags]
 echo.
 echo ^<target^>   = Name of source file minus `.c` extension.
 echo ^<platform^> = Target platform, `linux`, `windows` or `other`.
