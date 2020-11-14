@@ -62,4 +62,4 @@ echo ^<platform^> = Target platform, `linux`, `windows` or `other`.
 echo ^<mode^>     = Build mode, `debug`, `release` or `release_small`.
 echo [compiler] = Compiler to use. Default is gcc.
 echo [cflags]   = Extra flags to pass to the compiler.
-exit /b 0
+exit /b
