@@ -55,11 +55,11 @@ exit /b 0
 
 :usage
 echo Usage:
-echo ./msvc.sh ^<target^> ^<platform^> ^<mode^> [compiler] [cflags]
+echo ./gnu.sh ^<target^> ^<platform^> ^<mode^> [compiler] [cflags]
 echo.
 echo ^<target^>   = Name of source file minus `.c` extension.
 echo ^<platform^> = Target platform, `linux`, `windows` or `other`.
 echo ^<mode^>     = Build mode, `debug`, `release` or `release_small`.
 echo [compiler] = Compiler to use. Default is gcc.
 echo [cflags]   = Extra flags to pass to the compiler.
-exit /b 0
+exit /b

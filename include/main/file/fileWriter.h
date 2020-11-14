@@ -3,7 +3,7 @@
 #include <inttypes.h>
 #include <stdio.h>
 
-#define fileWriter_init_FILE_OPEN_ERROR -1
+#define fileWriter_open_FILE_OPEN_ERROR -1
 #define fileWriter_append_FILE_WRITE_ERROR -1
 #define fileWriter_close_FILE_CLOSE_ERROR -1
 
