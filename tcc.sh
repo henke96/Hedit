@@ -1,28 +1,28 @@
 usage() {
     echo "Usage:"
-    echo "./gnu.sh <compiler> <platform> <mode> <target> [cflags]"
+    echo "./tcc.sh <target> <platform> <mode> [compiler] [cflags]"
     echo ""
-    echo "<compiler> = Compiler to use. Needs to be compatible with tcc."
-    echo "<platform> = Target platform, \`linux\`, \`windows\` or \`other\`."
-    echo "<mode>     = Build mode, \`debug\` or \`release\`."
     echo "<target>   = Name of source file minus \`.c\` extension."
+    echo "<platform> = Target platform, \`linux\`, \`windows\` or \`other\`."
+    echo "<mode>     = Build mode, \`debug\`, \`release\` or \`release_small\`."
+    echo "[compiler] = Compiler to use. Default is tcc."
     echo "[cflags]   = Extra flags to pass to the compiler."
 }
 
-if test $# -lt 4; then
+if test $# -lt 3; then
     usage
     exit 1
 fi
 
 flags="-Iinclude -DHEDIT_UNREACHABLE= -Wall -Wwrite-strings $5"
-output_extension=""
 if test $2 = "linux"; then
-    flags="${flags} -DHEDIT_PLATFORM_LINUX"
+    flags="$flags -DHEDIT_PLATFORM_LINUX"
+    output_extension=""
 elif test $2 = "windows"; then
-    flags="${flags} -DHEDIT_PLATFORM_WINDOWS"
+    flags="$flags -DHEDIT_PLATFORM_WINDOWS"
     output_extension=".exe"
 elif test $2 = "other"; then
-    flags="${flags} -DHEDIT_PLATFORM_OTHER"
+    flags="$flags -DHEDIT_PLATFORM_OTHER"
     output_extension=".bin"
 else
     usage
@@ -37,5 +37,6 @@ else
     usage
     exit 1
 fi
+compiler=${4-tcc}
 
-"$1" ${flags} -o "$4_$1_$3$output_extension" "$4.c"
+"$compiler" $flags -o "$1_$3_$compiler$output_extension" "$1.c"
