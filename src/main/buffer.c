@@ -1,6 +1,6 @@
 #include "main/buffer.h"
 
-#include <malloc.h>
+#include <stdlib.h>
 #include <string.h>
 #include <assert.h>
 #include <stdio.h>
@@ -293,7 +293,7 @@ static void buffer_unregisterCursor(struct buffer *self, struct buffer_cursor *c
     assert(0);
 }
 
-struct bufferChunk buffer_getCursorChunk(const struct buffer *self, const struct buffer_cursor *cursor) {
+static struct bufferChunk buffer_getCursorChunk(const struct buffer *self, const struct buffer_cursor *cursor) {
     struct bufferChunk chunk;
     if (cursor->offset < 0) {
         struct buffer_modification *modification = &self->modifications[cursor->prevModificationIndex];
