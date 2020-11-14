@@ -39,4 +39,4 @@ else
 fi
 compiler=${4-tcc}
 
-"$compiler" $flags -o "$1_$3_$compiler$output_extension" "$1.c"
+"$compiler" $flags -o "$1_$3_$(basename $compiler)$output_extension" "$1.c"
