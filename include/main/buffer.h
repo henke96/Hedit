@@ -22,7 +22,7 @@ struct buffer_cursor {
 struct buffer {
     const char *text;
     int64_t textLength;
-    int64_t bufferLength;
+    int64_t length;
     struct buffer_modification *modifications;
     struct buffer_cursor **registeredCursors;
     int32_t numModifications;
@@ -41,7 +41,6 @@ static int buffer_deleteAtCursor(struct buffer *self, const struct buffer_cursor
 
 static struct bufferChunk buffer_getCursorChunk(const struct buffer *self, const struct buffer_cursor *cursor);
 
-#define buffer_GET_LENGTH(SELF) ((SELF).bufferLength)
 #define buffer_MOVE_CURSOR_TO(SELF, CURSOR, BUFFER_OFFSET) buffer_moveCursor(&(SELF), &(CURSOR), (BUFFER_OFFSET) - cursor.bufferOffset) 
 
 static inline char buffer_getAtCursor(const struct buffer *self, struct buffer_cursor *cursor) {
@@ -59,5 +58,3 @@ static inline char buffer_getAtCursor(const struct buffer *self, struct buffer_c
 
 static void buffer_cursor_init(struct buffer_cursor *self, const struct buffer *buffer);
 #define buffer_cursor_DEINIT(SELF)
-
-#define buffer_cursor_GET_OFFSET(SELF) ((SELF).bufferOffset)

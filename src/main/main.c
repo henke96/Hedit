@@ -10,21 +10,21 @@ static void main_printBuffer(struct buffer *buffer, struct buffer_cursor *cursor
     struct buffer_cursor cursorCopy;
     buffer_cursor_INIT_COPY(cursorCopy, *cursor);
 
-    while (buffer_cursor_GET_OFFSET(cursorCopy) != buffer_GET_LENGTH(*buffer)) {
+    while (cursorCopy.bufferOffset != buffer->length) {
         struct bufferChunk chunk = buffer_getCursorChunk(buffer, &cursorCopy);
-        assert(bufferChunk_GET_CURSOR_OFFSET(chunk) == 0);
-        assert(bufferChunk_GET_LENGTH(chunk) > 0);
+        assert(chunk.cursorOffset == 0);
+        assert(chunk.length > 0);
 
-        printf("%.*s", (int)bufferChunk_GET_LENGTH(chunk), bufferChunk_GET_TEXT(chunk));
+        printf("%.*s", (int)chunk.length, chunk.text);
 
-        buffer_moveCursor(buffer, &cursorCopy, bufferChunk_GET_LENGTH(chunk));
+        buffer_moveCursor(buffer, &cursorCopy, chunk.length);
     }
     buffer_cursor_DEINIT(cursorCopy);
     printf("\n");
 }
 
 static void main_printBufferData(struct buffer *buffer) {
-    printf("Printing buffer data:\n\tLen: %" PRId64 ", Orig len: %" PRId64 ", Num modifications: %" PRId32 "\n\tText:\n", buffer->bufferLength, buffer->textLength, buffer->numModifications);
+    printf("Printing buffer data:\n\tLen: %" PRId64 ", Orig len: %" PRId64 ", Num modifications: %" PRId32 "\n\tText:\n", buffer->length, buffer->textLength, buffer->numModifications);
     int32_t nextModificationIndex = 0;
     int64_t textOffset = 0;
     while (1) {
@@ -66,14 +66,14 @@ static int main_writeBufferToFile(const struct buffer *buffer, const char *path)
     struct buffer_cursor readCursor;
     buffer_cursor_init(&readCursor, buffer);
 
-    while (buffer_cursor_GET_OFFSET(readCursor) != buffer_GET_LENGTH(*buffer)) {
+    while (readCursor.bufferOffset != buffer->length) {
         struct bufferChunk chunk = buffer_getCursorChunk(buffer, &readCursor);
-        assert(bufferChunk_GET_CURSOR_OFFSET(chunk) == 0);
-        assert(bufferChunk_GET_LENGTH(chunk) > 0);
-        if (fileWriter_append(&fileWriter, bufferChunk_GET_TEXT(chunk), bufferChunk_GET_LENGTH(chunk)) < 0) {
+        assert(chunk.cursorOffset == 0);
+        assert(chunk.length > 0);
+        if (fileWriter_append(&fileWriter, chunk.text, chunk.length) < 0) {
             return -1;
         }
-        buffer_moveCursor(buffer, &readCursor, bufferChunk_GET_LENGTH(chunk));
+        buffer_moveCursor(buffer, &readCursor, chunk.length);
     }
     buffer_cursor_DEINIT(readCursor);
 
@@ -91,7 +91,7 @@ static void main_test2(void) {
     }
 
     struct buffer buffer;
-    buffer_init(&buffer, fileMapping_GET_CONTENT(fileMapping), fileMapping_GET_CONTENT_SIZE(fileMapping));
+    buffer_init(&buffer, fileMapping.content, fileMapping.contentSize);
 
     struct buffer_cursor cursor;
     buffer_cursor_init(&cursor, &buffer);
@@ -228,7 +228,7 @@ static int main_simple(void) {
     if (fileMapping_init(&fileMapping, "src/main/buffer.c") < 0) return 1;
 
     struct buffer buffer;
-    buffer_init(&buffer, fileMapping_GET_CONTENT(fileMapping), fileMapping_GET_CONTENT_SIZE(fileMapping));
+    buffer_init(&buffer, fileMapping.content, fileMapping.contentSize);
 
     struct buffer_cursor lineCursor;
     buffer_cursor_init(&lineCursor, &buffer);
@@ -238,31 +238,28 @@ static int main_simple(void) {
         struct buffer_cursor cursorCopy;
 
         // Print a line.
-        if (buffer_cursor_GET_OFFSET(lineCursor) == buffer_GET_LENGTH(buffer)) goto skipPrintLine;
+        if (lineCursor.bufferOffset == buffer.length) goto skipPrintLine;
 
         if (buffer_getAtCursor(&buffer, &lineCursor) == 10) {
             buffer_moveCursor(&buffer, &lineCursor, 1);
-        } else if (buffer_cursor_GET_OFFSET(lineCursor) != 0) goto skipPrintLine;
+        } else if (lineCursor.bufferOffset != 0) goto skipPrintLine;
 
         buffer_cursor_INIT_COPY(cursorCopy, lineCursor);
         while (1) {
             struct bufferChunk chunk = buffer_getCursorChunk(&buffer, &cursorCopy);
-            assert(bufferChunk_GET_LENGTH(chunk) > 0);
+            assert(chunk.length > 0);
 
-            const char *chunkText = bufferChunk_GET_TEXT(chunk);
-            int64_t chunkLength = bufferChunk_GET_LENGTH(chunk);
-            int64_t chunkCursorOffset = bufferChunk_GET_CURSOR_OFFSET(chunk);
-            for (int64_t i = chunkCursorOffset; i < chunkLength; ++i) {
-                if (chunkText[i] != 10) continue;
+            for (int64_t i = chunk.cursorOffset; i < chunk.length; ++i) {
+                if (chunk.text[i] != 10) continue;
 
-                buffer_moveCursor(&buffer, &cursorCopy, i - chunkCursorOffset);
-                printf("%d:%.*s", (int)(buffer_cursor_GET_OFFSET(lineCursor)), (int)(i - chunkCursorOffset), &chunkText[chunkCursorOffset]);
+                buffer_moveCursor(&buffer, &cursorCopy, i - chunk.cursorOffset);
+                printf("%d:%.*s", (int)(lineCursor.bufferOffset), (int)(i - chunk.cursorOffset), &chunk.text[chunk.cursorOffset]);
                 goto foundLineEnd;
             }
             // Line end not in chunk.
-            printf("%d:%.*s", (int)(buffer_cursor_GET_OFFSET(lineCursor)), (int)(chunkLength - chunkCursorOffset), &chunkText[chunkCursorOffset]);
-            buffer_moveCursor(&buffer, &cursorCopy, (chunkLength - chunkCursorOffset));
-            if (buffer_cursor_GET_OFFSET(cursorCopy) == buffer_GET_LENGTH(buffer)) break;
+            printf("%d:%.*s", (int)(lineCursor.bufferOffset), (int)(chunk.length - chunk.cursorOffset), &chunk.text[chunk.cursorOffset]);
+            buffer_moveCursor(&buffer, &cursorCopy, (chunk.length - chunk.cursorOffset));
+            if (cursorCopy.bufferOffset == buffer.length) break;
         }
         foundLineEnd:
         buffer_cursor_DEINIT(lineCursor);

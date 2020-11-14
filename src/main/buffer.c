@@ -30,7 +30,6 @@ static int buffer_modification_init(
     return 0;
 }
 
-
 #define buffer_modification_GET_INSERT_START(SELF) ((SELF).insertEnd - (SELF).insertLength)
 
 static void buffer_modification_deinit(struct buffer_modification *self) {
@@ -251,7 +250,7 @@ static void buffer_init(struct buffer *self, const char *text, int64_t textLengt
     assert(textLength >= 0);
     self->text = text;
     self->textLength = textLength;
-    self->bufferLength = textLength;
+    self->length = textLength;
     self->numModifications = 0;
     self->modifications = NULL;
     self->registeredCursorsCapacity = 0;
@@ -322,7 +321,7 @@ struct bufferChunk buffer_getCursorChunk(const struct buffer *self, const struct
 
 static void buffer_moveCursor(const struct buffer *self, struct buffer_cursor *cursor, int64_t offset) {
     cursor->bufferOffset += offset;
-    assert(cursor->bufferOffset >= 0 && cursor->bufferOffset <= self->bufferLength);
+    assert(cursor->bufferOffset >= 0 && cursor->bufferOffset <= self->length);
 
     int64_t cursorOffset = cursor->offset + offset;
     if (offset >= 0) {
@@ -426,7 +425,7 @@ static int buffer_insertAtCursor(struct buffer *self, const struct buffer_cursor
         }
     }
 
-    self->bufferLength += strLength;
+    self->length += strLength;
     return 0;
 }
 
@@ -544,7 +543,7 @@ static int buffer_deleteAtCursor(struct buffer *self, const struct buffer_cursor
         }
     }
 
-    self->bufferLength -= length;
+    self->length -= length;
     return 0;
 }
 
