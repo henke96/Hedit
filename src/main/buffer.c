@@ -30,13 +30,12 @@ static int buffer_modification_init(
     return 0;
 }
 
-static inline char *buffer_modification_getInsertStart(const struct buffer_modification *self) {
-    return self->insertEnd - self->insertLength;
-}
+
+#define buffer_modification_GET_INSERT_START(SELF) ((SELF).insertEnd - (SELF).insertLength)
 
 static void buffer_modification_deinit(struct buffer_modification *self) {
     if (self->insertLength > 0) {
-        free(buffer_modification_getInsertStart(self));
+        free(buffer_modification_GET_INSERT_START(*self));
     }
 }
 
@@ -132,7 +131,7 @@ static int buffer_insertIntoModification(struct buffer *self, int32_t index, int
     if (modification->insertLength > 0) {
         // Insert into existing insertion.
         int64_t newLength = modification->insertLength + strLength;
-        char *insert = realloc(buffer_modification_getInsertStart(modification), newLength);
+        char *insert = realloc(buffer_modification_GET_INSERT_START(*modification), newLength);
         if (!insert) return -1;
 
         memmove(insert + insertOffset + strLength, insert + insertOffset, modification->insertLength - insertOffset);
@@ -176,7 +175,7 @@ static void buffer_deleteFromModification(struct buffer *self, int32_t index, in
     int64_t newLength = modification->insertLength - deleteLength;
     assert(newLength >= 0);
 
-    char *oldInsert = buffer_modification_getInsertStart(modification);
+    char *oldInsert = buffer_modification_GET_INSERT_START(*modification);
 
     if (newLength == 0) {
         // Delete everything.

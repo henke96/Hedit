@@ -7,14 +7,6 @@ struct bufferChunk {
     int64_t cursorOffset;
 };
 
-static inline const char *bufferChunk_getText(const struct bufferChunk *self) {
-    return self->text;
-}
-
-static inline int64_t bufferChunk_getLength(const struct bufferChunk *self) {
-    return self->length;
-}
-
-static inline int64_t bufferChunk_getCursorOffset(const struct bufferChunk *self) {
-    return self->cursorOffset;
-}
+#define bufferChunk_GET_TEXT(SELF) ((SELF).text)
+#define bufferChunk_GET_LENGTH(SELF) ((SELF).length)
+#define bufferChunk_GET_CURSOR_OFFSET(SELF) ((SELF).cursorOffset)

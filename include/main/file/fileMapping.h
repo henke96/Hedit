@@ -25,10 +25,5 @@ struct fileMapping {
 static int fileMapping_init(struct fileMapping *self, const char *path);
 static void fileMapping_deinit(struct fileMapping *self);
 
-static inline char *fileMapping_getContent(const struct fileMapping *self) {
-    return self->content;
-}
-
-static inline int64_t fileMapping_getContentSize(const struct fileMapping *self) {
-    return self->contentSize;
-}
+#define fileMapping_GET_CONTENT(SELF) ((SELF).content)
+#define fileMapping_GET_CONTENT_SIZE(SELF) ((SELF).contentSize)

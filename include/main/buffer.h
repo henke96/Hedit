@@ -41,13 +41,8 @@ static int buffer_deleteAtCursor(struct buffer *self, const struct buffer_cursor
 
 static struct bufferChunk buffer_getCursorChunk(const struct buffer *self, const struct buffer_cursor *cursor);
 
-static inline int64_t buffer_getLength(const struct buffer *self) {
-    return self->bufferLength;
-}
-
-static inline void buffer_moveCursorTo(struct buffer *self, struct buffer_cursor *cursor, int64_t bufferOffset) {
-    buffer_moveCursor(self, cursor, bufferOffset - cursor->bufferOffset);
-}
+#define buffer_GET_LENGTH(SELF) ((SELF).bufferLength)
+#define buffer_MOVE_CURSOR_TO(SELF, CURSOR, BUFFER_OFFSET) buffer_moveCursor(&(SELF), &(CURSOR), (BUFFER_OFFSET) - cursor.bufferOffset) 
 
 static inline char buffer_getAtCursor(const struct buffer *self, struct buffer_cursor *cursor) {
     if (cursor->offset < 0) {
@@ -59,13 +54,10 @@ static inline char buffer_getAtCursor(const struct buffer *self, struct buffer_c
     }
 }
 
-static inline void buffer_cursor_init_copy(struct buffer_cursor *self, const struct buffer_cursor *copyFrom) {
-    *self = *copyFrom;
-}
+#define buffer_cursor_INIT_COPY(SELF, COPY_FROM) \
+    (SELF) = (COPY_FROM)
 
 static void buffer_cursor_init(struct buffer_cursor *self, const struct buffer *buffer);
-#define buffer_cursor_deinit(self)
+#define buffer_cursor_DEINIT(SELF)
 
-static inline int64_t buffer_cursor_getOffset(const struct buffer_cursor *self) {
-    return self->bufferOffset;
-}
+#define buffer_cursor_GET_OFFSET(SELF) ((SELF).bufferOffset)

@@ -12,10 +12,10 @@ struct fileWriter {
     FILE *handle;
 };
 
-static inline void fileWriter_init(struct fileWriter *self, const char *path) {
-    self->path = path;
-}
-#define fileWriter_deinit(self)
+#define fileWriter_INIT(SELF, PATH) \
+    (SELF).path = (PATH)
+
+#define fileWriter_DEINIT(SELF)
 
 static int fileWriter_open(struct fileWriter *self);
 static int fileWriter_append(const struct fileWriter *self, const char *data, int64_t length);
