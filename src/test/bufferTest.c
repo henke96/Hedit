@@ -26,7 +26,7 @@ static bool bufferTest_assertBufferContents(const struct buffer *buffer, const c
         content
     );
     // Print buffer contents.
-    while (cursor.offset != bufferLength) {
+    while (cursor.bufferOffset != bufferLength) {
         struct bufferChunk chunk = buffer_getCursorChunk(buffer, &cursor);
         printf("%.*s", (int)chunk.length, chunk.text);
         buffer_moveCursor(buffer, &cursor, chunk.length);
@@ -37,13 +37,13 @@ static bool bufferTest_assertBufferContents(const struct buffer *buffer, const c
 }
 
 static bool bufferTest_assertCursorOffset(const struct buffer_cursor *cursor, int64_t offset, const char *testName, int32_t testLine) {
-    if (cursor->offset == offset) return true;
+    if (cursor->bufferOffset == offset) return true;
     test_printTestFail(testName, __FILE__, testLine);
     printf(
         "\tCursor offset not as expected!\n"
         "\tExpected: %" PRId64 "\n"
         "\tActual: %" PRId64 "\n",
-        offset, cursor->offset
+        offset, cursor->bufferOffset
     );
     return false;
 }
