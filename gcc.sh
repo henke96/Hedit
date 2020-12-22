@@ -1,6 +1,6 @@
 usage() {
     echo "Usage:"
-    echo "./gnu.sh <target> <platform> <mode> [compiler] [cflags]"
+    echo "./gcc.sh <target> <platform> <mode> [compiler] [cflags]"
     echo ""
     echo "<target>   = Name of source file minus \`.c\` extension."
     echo "<platform> = Target platform, \`linux\`, \`windows\` or \`other\`."
