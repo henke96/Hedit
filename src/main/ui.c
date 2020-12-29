@@ -2,7 +2,7 @@
 #include <stdbool.h>
 
 // Returns characters printed if successful.
-static int64_t ui_printLine(struct ui *self) {
+static int64_t ui_printLine(const struct ui *self) {
     if (self->lineCursor.bufferOffset == self->buffer->length) return 0;
 
     struct buffer_cursor cursorCopy;
