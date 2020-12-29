@@ -1,6 +1,7 @@
 #include "src/main/main.c"
 #include "src/main/buffer.c"
 #include "src/main/file/fileWriter.c"
+#include "src/main/ui.c"
 
 #if defined(HEDIT_PLATFORM_LINUX)
 #include "src/main/file/fileMapping.linux.c"
