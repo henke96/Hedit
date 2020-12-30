@@ -68,16 +68,12 @@ static int ui_parseInt64(const char *input, int64_t inputLength, int64_t *out_re
 }
 
 // Returns length if successful.
-static int64_t ui_readInput(struct ui *self) {
+static int64_t ui_readInput(struct ui *self, bool stripLineEnd) {
     int64_t inputBufferIndex = 0;
 
     while (1) {
         int ch = getchar();
-        if (ch < 32) {
-            if (ch == EOF) return -1;
-            if (ch == '\n') return inputBufferIndex;
-            continue;
-        }
+        if (ch == EOF) return -1;
         // Realloc buffer if needed.
         if (inputBufferIndex == self->inputBufferCapacity) {
             if (inputBufferIndex == INT64_MAX) return -2;
@@ -89,9 +85,16 @@ static int64_t ui_readInput(struct ui *self) {
             self->inputBuffer = newInputBuffer;
             self->inputBufferCapacity = newCapacity;
         }
-
         self->inputBuffer[inputBufferIndex++] = ch;
+        if (ch == '\n') break;
     }
+    if (stripLineEnd) {
+        if (inputBufferIndex > 1 && self->inputBuffer[inputBufferIndex - 2] == '\r') {
+            return inputBufferIndex - 2;
+        }
+        return inputBufferIndex - 1;
+    }
+    return inputBufferIndex;
 }
 
 static bool ui_checkCommand(struct ui *self, int64_t *inout_inputLength, const char *command, int commandLength) {
@@ -117,7 +120,7 @@ static int ui_run(struct ui *self) {
     if (lineLength < 0) return -1;
 
     while (1) {
-        int64_t inputLength = ui_readInput(self);
+        int64_t inputLength = ui_readInput(self, true);
         if (inputLength < 0) return -2;
 
         //printf("%.*s\n", (int)inputLength, self->inputBuffer);
@@ -126,15 +129,15 @@ static int ui_run(struct ui *self) {
             buffer_moveCursor(self->buffer, &self->lineCursor, lineLength);
         } else if (ui_checkCommand(self, &inputLength, "edit", 4)) {
             if (inputLength == 0) {
-                inputLength = ui_readInput(self);
+                inputLength = ui_readInput(self, false);
                 if (inputLength < 0) goto cancel; 
             }
             // TODO: Better error handling, might need changes in buffer..
-            if (buffer_deleteAtCursor(self->buffer, &self->lineCursor, lineLength - 1) < 0) return -3; // Keep the linefeed.
+            if (buffer_deleteAtCursor(self->buffer, &self->lineCursor, lineLength) < 0) return -3;
             if (buffer_insertAtCursor(self->buffer, &self->lineCursor, self->inputBuffer, inputLength) < 0) return -4;
         } else if (ui_checkCommand(self, &inputLength, "goto", 4)) {
             if (inputLength == 0) {
-                inputLength = ui_readInput(self);
+                inputLength = ui_readInput(self, true);
                 if (inputLength < 0) goto cancel; 
             }
             int64_t gotoLocation;
