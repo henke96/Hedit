@@ -138,7 +138,7 @@ static int ui_run(struct ui *self) {
         } else if (ui_checkCommand(self, &inputLength, "goto", 4)) {
             if (inputLength == 0) {
                 inputLength = ui_readInput(self, true);
-                if (inputLength < 0) goto cancel; 
+                if (inputLength < 0) goto cancel;
             }
             int64_t gotoLocation;
             if (ui_parseInt64(self->inputBuffer, inputLength, &gotoLocation) >= 0) {
